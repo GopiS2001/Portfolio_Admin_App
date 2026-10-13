@@ -317,7 +317,7 @@ export const toast = {
 /** Render once near the root; `toast.success()` / `toast.error()` show a message for a few seconds. */
 export function ToastHost() {
   const [state, setState] = useState<ToastState>(null);
-  const opacity = useRef(new Animated.Value(0)).current;
+  const [opacity] = useState(() => new Animated.Value(0));
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
