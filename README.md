@@ -32,6 +32,19 @@ button, or set `EXPO_PUBLIC_SERVER_URL=http://<ip>:4000` in `App/.env`.
 
 If the phone cannot connect, allow Node.js through Windows Firewall for private networks.
 
+### Phone on a different network (hotspot, guest Wi-Fi)
+
+When the phone cannot reach the computer directly, run this instead of `npx expo start`
+(the backend must already be running):
+
+```bash
+npm run tunnel
+```
+
+It opens a free Cloudflare tunnel to the API, then starts `expo start --tunnel` with the app
+pointed at it — no server address to type. The tunnel address changes on every run.
+In this mode "Open website" / "Preview" links do not work (only the API is tunnelled).
+
 ## Code layout
 
 - `src/app/` — screens (Expo Router: `(tabs)/` is the bottom tab bar, `content/` the content pages)
