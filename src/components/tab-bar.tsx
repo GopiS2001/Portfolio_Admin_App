@@ -33,7 +33,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
-          const color = focused ? theme.colors.primary : theme.colors.onSurface;
+          const color = focused ? theme.colors.primary : theme.colors.onSurfaceVariant;
           const label = typeof options.title === 'string' ? options.title : route.name;
           const badge = options.tabBarBadge;
 
