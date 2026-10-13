@@ -230,7 +230,8 @@ export function FormField({ field, value, error, onChange }: FieldProps) {
             numberOfLines={field.type === 'textarea' ? field.rows ?? 3 : 1}
             invalid={!!error}
             keyboardType={field.keyboard ?? 'default'}
-            autoCapitalize={field.keyboard ? 'none' : 'sentences'}
+            secureTextEntry={field.type === 'password'}
+            autoCapitalize={field.keyboard || field.type === 'password' ? 'none' : 'sentences'}
           />
           <Helper text={field.helperText} error={error} />
         </View>
