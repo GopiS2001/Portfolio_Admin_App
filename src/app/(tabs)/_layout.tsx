@@ -10,11 +10,11 @@ import { FONT, useAppTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
-const tabIcon =
-  (active: string, inactive: string) =>
-  ({ color, focused }: { color: ColorValue; focused: boolean }) => (
-    <Icon source={focused ? active : inactive} size={24} color={color as string} />
-  );
+/** Filled icon on the active tab, outlined otherwise. */
+const tabIcon = (active: string, inactive: string) =>
+  function TabIcon({ color, focused }: { color: ColorValue; focused: boolean }) {
+    return <Icon source={focused ? active : inactive} size={24} color={color as string} />;
+  };
 
 export default function TabLayout() {
   const theme = useAppTheme();
