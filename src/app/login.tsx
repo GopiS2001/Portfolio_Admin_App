@@ -5,7 +5,7 @@ import { View, Text, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } fr
 import { colors } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { DEFAULT_SERVER_URL } from '@/lib/api';
-import { Icon, Card, Button, ErrorBanner } from '@/components/ui';
+import { Icon, Card, Button, IconButton, ErrorBanner } from '@/components/ui';
 import { Input, Helper, FieldLabel } from '@/components/fields';
 
 // ----------------------------------------------------------------------
