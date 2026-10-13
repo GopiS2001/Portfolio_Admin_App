@@ -1,21 +1,31 @@
-import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PaperProvider, ActivityIndicator } from 'react-native-paper';
+import { Stack, DarkTheme, ThemeProvider, DefaultTheme } from 'expo-router';
+import {
+  useFonts,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 
-import { colors } from '@/theme';
 import { ToastHost } from '@/components/ui';
 import { useAuth, AuthProvider } from '@/lib/auth';
+import { FONT, darkTheme, lightTheme, useAppTheme, navigationTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
 function RootNavigator() {
+  const theme = useAppTheme();
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -23,11 +33,12 @@ function RootNavigator() {
   return (
     <Stack
       screenOptions={{
-        headerTintColor: colors.text,
-        headerTitleStyle: { fontWeight: '700' },
-        headerStyle: { backgroundColor: colors.paper },
-        contentStyle: { backgroundColor: colors.background },
+        headerTitleStyle: { fontFamily: FONT.bold, fontSize: 18 },
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: theme.colors.background },
+        contentStyle: { backgroundColor: theme.colors.background },
         headerBackButtonDisplayMode: 'minimal',
+        headerTintColor: theme.colors.onSurface,
       }}
     >
       <Stack.Protected guard={!!user}>
@@ -48,13 +59,31 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  const scheme = useColorScheme();
+  const theme = scheme === 'dark' ? darkTheme : lightTheme;
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
+  });
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
+  }
+
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="dark" />
-        <RootNavigator />
-        <ToastHost />
-      </AuthProvider>
+      <PaperProvider theme={theme}>
+        <ThemeProvider value={navigationTheme(theme, theme.dark ? DarkTheme : DefaultTheme)}>
+          <AuthProvider>
+            <StatusBar style={theme.dark ? 'light' : 'dark'} />
+            <RootNavigator />
+            <ToastHost />
+          </AuthProvider>
+        </ThemeProvider>
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }
