@@ -65,14 +65,29 @@ export default function AccountScreen() {
 
   return (
     <Screen>
-      <Card title="Admin account" subheader="Used to sign in to the dashboard and this app.">
+      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+        <Avatar.Text
+          size={76}
+          label={(user?.displayName ?? 'A').slice(0, 1).toUpperCase()}
+          style={{ backgroundColor: theme.colors.primaryContainer }}
+          labelStyle={{ color: theme.colors.onPrimaryContainer, fontFamily: theme.fonts.headlineMedium.fontFamily }}
+        />
+        <Text variant="titleLarge" style={{ marginTop: 12 }}>
+          {user?.displayName}
+        </Text>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+          {user?.email}
+        </Text>
+      </View>
+
+      <Card title="Admin account" subheader="Used to sign in to the dashboard and this app." icon="account-cog-outline">
         <FormFields fields={ACCOUNT_FIELDS} form={account} />
-        <Button label="Save account" loading={savingAccount} onPress={saveAccount} style={{ marginTop: 20 }} />
+        <Button icon="check" label="Save account" loading={savingAccount} onPress={saveAccount} style={{ marginTop: 20 }} />
       </Card>
 
-      <Card title="Change password">
+      <Card title="Change password" subheader="At least 6 characters." icon="lock-reset">
         <FormFields fields={PASSWORD_FIELDS} form={password} />
-        <Button label="Change password" loading={savingPassword} onPress={savePassword} style={{ marginTop: 20 }} />
+        <Button icon="lock-check-outline" label="Change password" loading={savingPassword} onPress={savePassword} style={{ marginTop: 20 }} />
       </Card>
     </Screen>
   );
