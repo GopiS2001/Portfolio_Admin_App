@@ -1,24 +1,37 @@
 import type { Message } from '@/lib/types';
 
 import { useState } from 'react';
-import { View, Text, Alert, Linking, Pressable, StyleSheet } from 'react-native';
+import { View, Linking, StyleSheet } from 'react-native';
+import { Text, Avatar, TouchableRipple, SegmentedButtons } from 'react-native-paper';
 
-import { colors } from '@/theme';
+import { useAppTheme } from '@/theme';
 import { endpoints as api } from '@/lib/api';
 import { deleteItem, updateItem, useResource } from '@/lib/store';
-import { Card, toast, Label, Screen, Divider, Loading, EmptyState, IconButton } from '@/components/ui';
+import { Card, toast, Label, Screen, Divider, Loading, EmptyState, IconButton, ConfirmDialog } from '@/components/ui';
 
 // ----------------------------------------------------------------------
 
 const fDateTime = (d: string) =>
-  new Date(d).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  new Date(d).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]!.toUpperCase())
+    .join('') || '?';
 
 /** Inbox for the website's contact form. */
 export default function MessagesScreen() {
+  const theme = useAppTheme();
   const { data, isLoading, refresh } = useResource<Message[]>(api.messages);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<Message | null>(null);
+  const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const messages = data ?? [];
   const unread = messages.filter((m) => !m.read).length;
+  const shown = filter === 'unread' ? messages.filter((m) => !m.read) : messages;
 
   const setRead = async (m: Message, read: boolean) => {
     try {
@@ -33,69 +46,91 @@ export default function MessagesScreen() {
     if (!m.read) setRead(m, true);
   };
 
-  const confirmDelete = (m: Message) =>
-    Alert.alert('Delete message?', `From ${m.name} <${m.email}>`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteItem(api.messages, m.id);
-            toast.success('Message deleted');
-          } catch (e) {
-            toast.error((e as Error).message);
-          }
-        },
-      },
-    ]);
+  const confirmDelete = async () => {
+    if (!deleting) return;
+    try {
+      await deleteItem(api.messages, deleting.id);
+      toast.success('Message deleted');
+      setDeleting(null);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   const renderBody = () => {
     if (isLoading) return <Loading />;
-    if (!messages.length) {
+    if (!shown.length) {
       return (
         <EmptyState
-          icon="mail-open-outline"
-          title="No messages yet"
-          description="Messages sent from the website's contact form appear here."
+          icon={filter === 'unread' ? 'email-check-outline' : 'email-open-outline'}
+          title={filter === 'unread' ? 'All caught up' : 'No messages yet'}
+          description={
+            filter === 'unread'
+              ? 'You have read every message.'
+              : "Messages sent from the website's contact form appear here."
+          }
         />
       );
     }
-    return messages.map((m, i) => {
+    return shown.map((m, i) => {
       const isOpen = expanded === m.id;
+      const tone = theme.custom.tones[m.read ? 'default' : 'info'];
       return (
-        <View key={m.id} style={{ backgroundColor: m.read ? 'transparent' : 'rgba(145,158,171,0.08)' }}>
-          {i > 0 && <Divider dashed />}
-          <Pressable onPress={() => open(m)} style={styles.item}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {!m.read && <Label tone="info">New</Label>}
-              <Text style={styles.name} numberOfLines={1}>
-                {m.name}
-              </Text>
-            </View>
-            <Text style={styles.email} numberOfLines={1}>
-              {m.email}
-            </Text>
-            <Text style={styles.body} numberOfLines={isOpen ? undefined : 2}>
-              {m.message}
-            </Text>
-            <View style={styles.footer}>
-              <Text style={styles.date}>{fDateTime(m.createdAt)}</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <IconButton
-                  icon="arrow-undo-outline"
-                  label="Reply by email"
-                  onPress={() => Linking.openURL(`mailto:${m.email}?subject=${encodeURIComponent('Re: your message')}`)}
-                />
-                <IconButton
-                  icon={m.read ? 'mail-unread-outline' : 'mail-open-outline'}
-                  label={m.read ? 'Mark as unread' : 'Mark as read'}
-                  onPress={() => setRead(m, !m.read)}
-                />
-                <IconButton icon="trash-outline" label="Delete" color={colors.error} onPress={() => confirmDelete(m)} />
+        <View key={m.id}>
+          {i > 0 && <Divider inset={72} />}
+          <TouchableRipple onPress={() => open(m)}>
+            <View style={styles.item}>
+              <Avatar.Text
+                size={42}
+                label={initials(m.name)}
+                style={{ backgroundColor: tone.bg }}
+                labelStyle={{ color: tone.fg, fontSize: 15, fontFamily: theme.fonts.titleSmall.fontFamily }}
+              />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <View style={styles.top}>
+                  <Text
+                    variant="titleSmall"
+                    numberOfLines={1}
+                    style={{ flexShrink: 1, fontFamily: m.read ? theme.fonts.bodyLarge.fontFamily : theme.fonts.titleSmall.fontFamily }}
+                  >
+                    {m.name}
+                  </Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {fDateTime(m.createdAt)}
+                  </Text>
+                </View>
+                <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
+                  {m.email}
+                </Text>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={isOpen ? undefined : 2}
+                  style={{ marginTop: 6, color: m.read ? theme.colors.onSurfaceVariant : theme.colors.onSurface }}
+                >
+                  {m.message}
+                </Text>
+
+                {isOpen && (
+                  <View style={styles.actions}>
+                    <IconButton
+                      tonal
+                      icon="reply-outline"
+                      label="Reply by email"
+                      onPress={() => Linking.openURL(`mailto:${m.email}?subject=${encodeURIComponent('Re: your message')}`)}
+                    />
+                    <IconButton
+                      tonal
+                      icon={m.read ? 'email-mark-as-unread' : 'email-open-outline'}
+                      label={m.read ? 'Mark as unread' : 'Mark as read'}
+                      onPress={() => setRead(m, !m.read)}
+                    />
+                    <IconButton tonal icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(m)} />
+                  </View>
+                )}
               </View>
+              {!m.read && <View style={[styles.dot, { backgroundColor: theme.custom.tones.info.main }]} />}
             </View>
-          </Pressable>
+          </TouchableRipple>
         </View>
       );
     });
@@ -103,18 +138,38 @@ export default function MessagesScreen() {
 
   return (
     <Screen anchor="contact" onRefresh={refresh}>
-      <Card title="Inbox" padded={false} action={unread > 0 ? <Label tone="info">{unread} unread</Label> : null}>
+      <SegmentedButtons
+        value={filter}
+        onValueChange={(v) => setFilter(v as 'all' | 'unread')}
+        buttons={[
+          { value: 'all', label: `All (${messages.length})`, icon: 'inbox-outline' },
+          { value: 'unread', label: `Unread (${unread})`, icon: 'email-alert-outline' },
+        ]}
+      />
+      <Card
+        title="Inbox"
+        subheader="Tap a message to read it and see actions."
+        icon="inbox-outline"
+        padded={false}
+        action={unread > 0 ? <Label tone="info">{`${unread} new`}</Label> : null}
+      >
         {renderBody()}
       </Card>
+
+      <ConfirmDialog
+        visible={!!deleting}
+        title="Delete message?"
+        content={deleting ? `From ${deleting.name} <${deleting.email}>` : ''}
+        onConfirm={confirmDelete}
+        onDismiss={() => setDeleting(null)}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  item: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4 },
-  name: { fontSize: 15, fontWeight: '700', color: colors.text, flexShrink: 1 },
-  email: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
-  body: { fontSize: 14, color: colors.text, marginTop: 8, lineHeight: 20 },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
-  date: { fontSize: 12, color: colors.textDisabled },
+  item: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: 18, paddingVertical: 14 },
+  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  dot: { width: 9, height: 9, borderRadius: 5, marginTop: 6 },
 });
