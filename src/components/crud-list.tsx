@@ -3,23 +3,24 @@ import type { FieldDef } from './fields';
 
 import { useMemo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  View,
-  Text,
-  Alert,
-  Modal,
-  Switch,
-  Platform,
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, Modal, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { Text, Portal, Switch, Appbar, Button as PaperButton } from 'react-native-paper';
 
-import { colors } from '@/theme';
+import { useAppTheme } from '@/theme';
 import { createItem, deleteItem, updateItem, useResource, reorderItems } from '@/lib/store';
 
 import { FormFields, useFieldForm } from './fields';
-import { Card, toast, Button, Divider, Loading, EmptyState, IconButton } from './ui';
+import {
+  Card,
+  toast,
+  Button,
+  Divider,
+  Loading,
+  ToastHost,
+  EmptyState,
+  IconButton,
+  ConfirmDialog,
+} from './ui';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ type CrudListProps<T extends Ordered> = {
   /** Singular noun for buttons and dialogs ("project"). */
   itemName: string;
   fields: FieldDef[];
+  icon?: string;
   renderPrimary: (item: T) => React.ReactNode;
   renderSecondary?: (item: T) => React.ReactNode;
   renderLeading?: (item: T) => React.ReactNode;
@@ -46,13 +48,16 @@ export function CrudList<T extends Ordered>({
   subheader,
   itemName,
   fields,
+  icon,
   renderPrimary,
   renderSecondary,
   renderLeading,
 }: CrudListProps<T>) {
+  const theme = useAppTheme();
   const { data, isLoading, error } = useResource<T[]>(url);
   const items = data ?? [];
   const [editing, setEditing] = useState<T | null | 'new'>(null);
+  const [deleting, setDeleting] = useState<T | null>(null);
 
   const toggleVisible = async (item: T) => {
     try {
@@ -75,36 +80,30 @@ export function CrudList<T extends Ordered>({
     }
   };
 
-  const confirmDelete = (item: T) =>
-    Alert.alert(`Delete ${itemName}?`, 'This removes it from the website and cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteItem(url, item.id);
-            toast.success(`Deleted ${itemName}`);
-          } catch (e) {
-            toast.error((e as Error).message);
-          }
-        },
-      },
-    ]);
+  const confirmDelete = async () => {
+    if (!deleting) return;
+    try {
+      await deleteItem(url, deleting.id);
+      toast.success(`Deleted ${itemName}`);
+      setDeleting(null);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   const renderList = () => {
     if (isLoading) return <Loading />;
-    if (error && !data) return <EmptyState icon="cloud-offline-outline" title="Could not load" description={error.message} />;
+    if (error && !data) {
+      return <EmptyState icon="cloud-off-outline" title="Could not load" description={error.message} />;
+    }
     if (!items.length) {
-      return (
-        <EmptyState title={`No ${itemName}s yet`} description={`Tap "Add" to create the first one.`} />
-      );
+      return <EmptyState title={`No ${itemName}s yet`} description={`Tap "Add" to create the first one.`} />;
     }
     return items.map((item, index) => (
       <View key={item.id}>
-        {index > 0 && <Divider dashed />}
-        <View style={[styles.row, { opacity: item.visible ? 1 : 0.55 }]}>
-          <View>
+        {index > 0 && <Divider inset={16} />}
+        <View style={[styles.row, { opacity: item.visible ? 1 : 0.5 }]}>
+          <View style={[styles.order, { backgroundColor: theme.custom.neutral }]}>
             <IconButton icon="chevron-up" label="Move up" size={18} disabled={index === 0} onPress={() => move(index, -1)} />
             <IconButton
               icon="chevron-down"
@@ -117,24 +116,18 @@ export function CrudList<T extends Ordered>({
 
           {renderLeading?.(item)}
 
-          <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-            <Text style={styles.primary} numberOfLines={2}>
+          <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+            <Text variant="titleSmall" numberOfLines={2}>
               {renderPrimary(item)}
             </Text>
             {renderSecondary && <View>{renderSecondary(item)}</View>}
           </View>
 
-          <View style={{ alignItems: 'center' }}>
-            <Switch
-              value={item.visible}
-              onValueChange={() => toggleVisible(item)}
-              trackColor={{ true: colors.primary, false: '#C4CDD5' }}
-              thumbColor={colors.white}
-              accessibilityLabel="Visible on website"
-            />
+          <View style={{ alignItems: 'flex-end', gap: 2 }}>
+            <Switch value={item.visible} onValueChange={() => toggleVisible(item)} accessibilityLabel="Visible on website" />
             <View style={{ flexDirection: 'row' }}>
-              <IconButton icon="create-outline" label="Edit" onPress={() => setEditing(item)} />
-              <IconButton icon="trash-outline" label="Delete" color={colors.error} onPress={() => confirmDelete(item)} />
+              <IconButton icon="pencil-outline" label="Edit" onPress={() => setEditing(item)} />
+              <IconButton icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(item)} />
             </View>
           </View>
         </View>
@@ -146,8 +139,9 @@ export function CrudList<T extends Ordered>({
     <Card
       title={title}
       subheader={subheader}
+      icon={icon}
       padded={false}
-      action={<Button size="small" icon="add" label="Add" onPress={() => setEditing('new')} />}
+      action={<Button size="small" variant="soft" icon="plus" label="Add" onPress={() => setEditing('new')} />}
     >
       {renderList()}
 
@@ -158,6 +152,14 @@ export function CrudList<T extends Ordered>({
         itemName={itemName}
         fields={fields}
         onClose={() => setEditing(null)}
+      />
+
+      <ConfirmDialog
+        visible={!!deleting}
+        title={`Delete ${itemName}?`}
+        content="This removes it from the website and cannot be undone."
+        onConfirm={confirmDelete}
+        onDismiss={() => setDeleting(null)}
       />
     </Card>
   );
@@ -180,6 +182,7 @@ function ItemEditor<T extends Ordered>({
   fields: FieldDef[];
   onClose: () => void;
 }) {
+  const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const allFields = useMemo<FieldDef[]>(
     () => [...fields, { name: 'visible', label: 'Show on website', type: 'switch' }],
@@ -189,18 +192,20 @@ function ItemEditor<T extends Ordered>({
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
-    if (!form.validate()) return;
+    if (!form.validate()) {
+      toast.error('Please fill in the required fields');
+      return;
+    }
     setSaving(true);
     try {
       const body = form.body() as Partial<T>;
       if (item) {
         await updateItem<T>(url, item.id, body);
-        toast.success(`Saved ${itemName}`);
       } else {
         await createItem<T>(url, body);
-        toast.success(`Added ${itemName}`);
       }
       onClose();
+      toast.success(item ? `Saved ${itemName}` : `Added ${itemName}`);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -208,47 +213,50 @@ function ItemEditor<T extends Ordered>({
     }
   };
 
+  const title = `${item ? 'Edit' : 'New'} ${itemName}`;
+
   return (
     <Modal visible={open} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.background }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={[styles.editorHeader, { paddingTop: Platform.OS === 'ios' ? 16 : insets.top + 12 }]}>
-          <Button variant="text" tone="default" label="Cancel" onPress={onClose} />
-          <Text style={styles.editorTitle}>
-            {item ? 'Edit' : 'Add'} {itemName}
-          </Text>
-          <Button variant="text" label={item ? 'Save' : 'Add'} loading={saving} onPress={save} />
+      {/* Dialogs (select pickers) and toasts must render inside the modal to appear above it */}
+      <Portal.Host>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+          <Appbar.Header
+            statusBarHeight={Platform.OS === 'ios' ? 0 : insets.top}
+            style={{ backgroundColor: theme.colors.surface }}
+            elevated
+          >
+            <Appbar.Action icon="close" onPress={onClose} accessibilityLabel="Cancel" />
+            <Appbar.Content title={title.charAt(0).toUpperCase() + title.slice(1)} titleStyle={theme.fonts.titleLarge} />
+            <PaperButton mode="contained" onPress={save} loading={saving} disabled={saving} style={{ marginRight: 8, borderRadius: 12 }}>
+              Save
+            </PaperButton>
+          </Appbar.Header>
+
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <ScrollView
+              contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 48 }}
+              keyboardShouldPersistTaps="handled"
+            >
+              <Card>
+                <FormFields fields={allFields} form={form} />
+              </Card>
+              <Button
+                label={item ? 'Save changes' : `Add ${itemName}`}
+                icon="check"
+                loading={saving}
+                onPress={save}
+                style={{ marginTop: 16 }}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
+          <ToastHost />
         </View>
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 48 }} keyboardShouldPersistTaps="handled">
-          <Card>
-            <FormFields fields={allFields} form={form} />
-          </Card>
-          <Button
-            label={item ? 'Save changes' : `Add ${itemName}`}
-            loading={saving}
-            onPress={save}
-            style={{ marginTop: 16 }}
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </Portal.Host>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 8 },
-  primary: { fontSize: 15, fontWeight: '600', color: colors.text },
-  editorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    paddingBottom: 8,
-    backgroundColor: colors.paper,
-    borderBottomWidth: 1,
-    borderColor: colors.divider,
-  },
-  editorTitle: { fontSize: 17, fontWeight: '700', color: colors.text, textTransform: 'capitalize' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingLeft: 10, paddingRight: 8 },
+  order: { borderRadius: 12 },
 });
