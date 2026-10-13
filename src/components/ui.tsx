@@ -78,6 +78,7 @@ export function Screen({
         ) : undefined
       }
     >
+      {header}
       {anchor !== undefined && (
         <PaperButton
           mode="text"
