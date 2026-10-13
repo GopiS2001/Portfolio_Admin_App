@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useMemo, useState, useEffect, useContext, useCallback, createContext } from 'react';
 
@@ -56,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     setUser(null);
     clearCache();
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await storage.remove(TOKEN_KEY);
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -71,12 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     (async () => {
       try {
-        const savedServer = await SecureStore.getItemAsync(SERVER_KEY);
+        const savedServer = await storage.get(SERVER_KEY);
         if (savedServer) {
           setServerUrl(savedServer);
           setServerUrlState(getServerUrl());
         }
-        const saved = await SecureStore.getItemAsync(TOKEN_KEY);
+        const saved = await storage.get(TOKEN_KEY);
         if (saved) {
           setToken(saved);
           await refreshUser();
@@ -95,7 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string, password: string, server: string) => {
       setServerUrl(server);
       setServerUrlState(getServerUrl());
-      await SecureStore.setItemAsync(SERVER_KEY, getServerUrl());
+      // Only remember a server you typed in. The detected one follows your computer's IP,
+      // so saving it would pin an old address after the IP changes.
+      if (getServerUrl() === DEFAULT_SERVER_URL) await storage.remove(SERVER_KEY);
+      else await storage.set(SERVER_KEY, getServerUrl());
 
       const { accessToken } = await http.post<{ accessToken: string }>(endpoints.signIn, {
         email: email.trim(),
@@ -103,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (!accessToken) throw new Error('Access token not found in response');
       setToken(accessToken);
-      await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
+      await storage.set(TOKEN_KEY, accessToken);
       await refreshUser();
     },
     [refreshUser]
