@@ -1,4 +1,5 @@
 import * as DocumentPicker from 'expo-document-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState, useCallback } from 'react';
 import { View, Image, Linking, Pressable, StyleSheet, ScrollView } from 'react-native';
 import {
