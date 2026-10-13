@@ -86,6 +86,21 @@ function buildTones(dark: boolean): Record<Tone, ToneColors> {
   };
 }
 
+// ---------------------------------------------------------------------- gradient tiles
+
+/** Two-stop gradients for icon tiles and feature cards (same in light and dark). */
+export const TILES = {
+  emerald: ['#5BE49B', '#00A76F'],
+  teal: ['#4FD1C5', '#0E8C83'],
+  sky: ['#7DD3FC', '#0284C7'],
+  violet: ['#C4B5FD', '#7C3AED'],
+  amber: ['#FCD34D', '#F59E0B'],
+  rose: ['#FDA4AF', '#E11D48'],
+  slate: ['#94A3B8', '#475569'],
+} as const satisfies Record<string, readonly [string, string]>;
+
+export type TileKey = keyof typeof TILES;
+
 // ---------------------------------------------------------------------- themes
 
 export type AppTheme = MD3Theme & {
