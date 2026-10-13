@@ -1,3 +1,4 @@
+import type { ColorValue } from 'react-native';
 import type { Summary } from '@/lib/types';
 
 import { Tabs } from 'expo-router';
