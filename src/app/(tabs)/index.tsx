@@ -5,7 +5,7 @@ import type { Message, Section, Summary, Settings } from '@/lib/types';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, Linking, StyleSheet } from 'react-native';
-import { Text, Avatar, TouchableRipple } from 'react-native-paper';
+import { Text, Avatar, TouchableRipple, Button as PaperButton } from 'react-native-paper';
 
 import { useAuth } from '@/lib/auth';
 import { useAppTheme } from '@/theme';
