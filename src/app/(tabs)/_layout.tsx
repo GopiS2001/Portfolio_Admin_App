@@ -11,8 +11,8 @@ import { FONT, useAppTheme } from '@/theme';
 
 const tabIcon =
   (active: string, inactive: string) =>
-  ({ color, focused }: { color: string; focused: boolean }) => (
-    <Icon source={focused ? active : inactive} size={24} color={color} />
+  ({ color, focused }: { color: ColorValue; focused: boolean }) => (
+    <Icon source={focused ? active : inactive} size={24} color={color as string} />
   );
 
 export default function TabLayout() {
