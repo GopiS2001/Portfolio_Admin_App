@@ -24,7 +24,7 @@ import { Icon, toast, Button, IconButton } from './ui';
 export type FieldDef = {
   name: string;
   label: string;
-  type?: 'text' | 'textarea' | 'tags' | 'switch' | 'select' | 'image' | 'file' | 'color' | 'links';
+  type?: 'text' | 'password' | 'textarea' | 'tags' | 'switch' | 'select' | 'image' | 'file' | 'color' | 'links';
   required?: boolean;
   helperText?: string;
   placeholder?: string;
