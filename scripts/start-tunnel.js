@@ -69,7 +69,7 @@ async function waitForTunnel(url) {
   console.log('Opening a tunnel to the API…');
   const { cf, url } = await startApiTunnel();
   console.log(`✔ API tunnel: ${url}`);
-  if (!(await waitForTunnel(url))) console.warn('! The tunnel is slow to answer — the app may need a moment.');
+  if (!(await waitForTunnel(url))) console.log('  (the tunnel is still warming up — it is usually ready within a minute)');
 
   const expo = spawn('npx', ['expo', 'start', '--tunnel', ...process.argv.slice(2)], {
     stdio: 'inherit',
