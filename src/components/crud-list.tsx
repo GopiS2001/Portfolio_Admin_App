@@ -101,9 +101,20 @@ export function CrudList<T extends Ordered>({
     }
     return items.map((item, index) => (
       <View key={item.id}>
-        {index > 0 && <Divider inset={16} />}
-        <View style={[styles.row, { opacity: item.visible ? 1 : 0.5 }]}>
-          <View style={[styles.order, { backgroundColor: theme.custom.neutral }]}>
+        {index > 0 && <Divider />}
+        <View style={styles.row}>
+          {/* Content gets the full width; the toolbar below holds order / visibility / edit / delete */}
+          <View style={[styles.content, { opacity: item.visible ? 1 : 0.5 }]}>
+            {renderLeading?.(item)}
+            <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+              <Text variant="titleSmall" numberOfLines={2}>
+                {renderPrimary(item)}
+              </Text>
+              {renderSecondary && <View>{renderSecondary(item)}</View>}
+            </View>
+          </View>
+
+          <View style={[styles.toolbar, { backgroundColor: theme.custom.neutral }]}>
             <IconButton icon="chevron-up" label="Move up" size={18} disabled={index === 0} onPress={() => move(index, -1)} />
             <IconButton
               icon="chevron-down"
@@ -112,23 +123,13 @@ export function CrudList<T extends Ordered>({
               disabled={index === items.length - 1}
               onPress={() => move(index, 1)}
             />
-          </View>
-
-          {renderLeading?.(item)}
-
-          <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
-            <Text variant="titleSmall" numberOfLines={2}>
-              {renderPrimary(item)}
+            <View style={{ flex: 1 }} />
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+              {item.visible ? 'Visible' : 'Hidden'}
             </Text>
-            {renderSecondary && <View>{renderSecondary(item)}</View>}
-          </View>
-
-          <View style={{ alignItems: 'flex-end', gap: 2 }}>
             <Switch value={item.visible} onValueChange={() => toggleVisible(item)} accessibilityLabel="Visible on website" />
-            <View style={{ flexDirection: 'row' }}>
-              <IconButton icon="pencil-outline" label="Edit" onPress={() => setEditing(item)} />
-              <IconButton icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(item)} />
-            </View>
+            <IconButton icon="pencil-outline" label="Edit" onPress={() => setEditing(item)} />
+            <IconButton icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(item)} />
           </View>
         </View>
       </View>
