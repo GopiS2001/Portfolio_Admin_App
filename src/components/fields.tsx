@@ -599,6 +599,7 @@ function UploadField({
 
 const styles = StyleSheet.create({
   helper: { paddingHorizontal: 4, paddingTop: 2, paddingBottom: 0 },
+  adornment: { position: 'absolute', top: 6, bottom: 0, justifyContent: 'center' },
   switchRow: { borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
   option: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 6 },
   tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
