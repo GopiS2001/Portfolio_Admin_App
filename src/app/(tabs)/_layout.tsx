@@ -26,12 +26,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarLabelStyle: { fontFamily: FONT.semibold, fontSize: 11 },
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.custom.divider,
-          height: undefined,
-          paddingTop: 6,
-        },
+        tabBarStyle: { backgroundColor: theme.colors.surface, borderTopColor: theme.custom.divider },
         headerTitleStyle: { fontFamily: FONT.bold, fontSize: 20, color: theme.colors.onSurface },
         headerStyle: { backgroundColor: theme.colors.background },
         headerShadowVisible: false,
