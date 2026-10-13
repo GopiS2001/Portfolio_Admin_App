@@ -86,10 +86,13 @@ export function useFieldForm(fields: FieldDef[], source?: Record<string, any> | 
   const [values, setValues] = useState<FormValues>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  // Start over when the record is (re)loaded or saved
+  const [prevInitial, setPrevInitial] = useState(initial);
+  if (prevInitial !== initial) {
+    setPrevInitial(initial);
     setValues(initial);
     setErrors({});
-  }, [initial]);
+  }
 
   const set = useCallback((name: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [name]: value }));
