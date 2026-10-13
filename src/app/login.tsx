@@ -106,6 +106,12 @@ export default function LoginScreen() {
                   Server: {server} · <Text style={{ color: colors.primary, fontWeight: '600' }}>Change</Text>
                 </Text>
               )}
+              {server.replace(/\/$/, '') !== DEFAULT_SERVER_URL && (
+                <Text style={styles.server} onPress={() => setServer(DEFAULT_SERVER_URL)}>
+                  This computer is now at {DEFAULT_SERVER_URL} ·{' '}
+                  <Text style={{ color: colors.primary, fontWeight: '600' }}>Use it</Text>
+                </Text>
+              )}
 
               <Button label="Sign in" loading={loading} onPress={submit} />
             </View>
