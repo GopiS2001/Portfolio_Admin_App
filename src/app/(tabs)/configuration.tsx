@@ -8,7 +8,15 @@ import { useMemo, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Platform, UIManager, StyleSheet, LayoutAnimation } from 'react-native';
-import { Text, Switch, Surface, ProgressBar, TouchableRipple, SegmentedButtons } from 'react-native-paper';
+import {
+  Text,
+  Switch,
+  Surface,
+  ProgressBar,
+  TouchableRipple,
+  SegmentedButtons,
+  Button as PaperButton,
+} from 'react-native-paper';
 
 import { useAuth } from '@/lib/auth';
 import { useAppTheme } from '@/theme';
