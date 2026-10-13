@@ -1,4 +1,4 @@
-import type { Tone } from '@/theme';
+import type { Tone, TileKey } from '@/theme';
 
 import { useState, useEffect, useCallback } from 'react';
 import { View, Linking, StyleSheet, ScrollView, RefreshControl } from 'react-native';
@@ -17,8 +17,6 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import type { TileKey } from '@/theme';
 
 import { FONT, TILES, useAppTheme } from '@/theme';
 import { websiteUrl } from '@/lib/api';
@@ -543,7 +541,7 @@ export function ToastHost() {
       visible={visible}
       onDismiss={() => setVisible(false)}
       duration={2800}
-      wrapperStyle={{ bottom: 72 }}
+      wrapperStyle={{ bottom: 104 }}
       style={{ borderRadius: 14, backgroundColor: theme.colors.inverseSurface }}
       icon="close"
       onIconPress={() => setVisible(false)}
@@ -627,6 +625,7 @@ export function ConfirmDialog({
 
 const styles = StyleSheet.create({
   screen: { padding: 16, gap: 16, paddingBottom: 56 },
+  tabHeader: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingHorizontal: 4, paddingBottom: 6 },
   card: {
     borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,

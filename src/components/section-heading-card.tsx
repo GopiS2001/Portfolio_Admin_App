@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { FONT, useAppTheme } from '@/theme';
+import { useAppTheme } from '@/theme';
 import { http, endpoints } from '@/lib/api';
 import { revalidate, useResource } from '@/lib/store';
 
@@ -102,4 +102,3 @@ export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
   );
 }
 
-export { FONT };

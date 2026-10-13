@@ -8,7 +8,7 @@ The admin dashboard as an Expo / React Native app. Same screens, same API, same 
 | **Content** → Home, About, Skills, Experience, Projects, Contact | Section settings + every list (add / edit / delete, show-hide, reorder) |
 | **Messages** | Contact-form inbox: read / unread, reply by email, delete |
 | **Configuration** | Section on/off + menu + order, site, header, blocks, theme, fonts, offline snapshot |
-| **Content → Account** | Change name, login email and password; sign out |
+| **Settings → Account** | Change name, login email and password; sign out |
 
 ## Run it in Expo Go
 

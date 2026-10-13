@@ -5,8 +5,7 @@ import { View, Linking, StyleSheet } from 'react-native';
 import { Text, Chip, Surface, Searchbar, TouchableRipple } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
-import { endpoints as api } from '@/lib/api';
-import { http } from '@/lib/api';
+import { http, endpoints as api } from '@/lib/api';
 import { revalidate, deleteItem, updateItem, useResource } from '@/lib/store';
 import {
   toast,
