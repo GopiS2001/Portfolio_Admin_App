@@ -314,18 +314,22 @@ export function SelectField({
   return (
     <View>
       <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={field.label}>
-        <View pointerEvents="none">
+        {/* Decorations are plain views (not TextInput.Icon buttons) so nothing tappable nests in the field */}
+        <View pointerEvents="none" style={{ justifyContent: 'center' }}>
           <Input
             label={field.label}
             value={current?.label ?? value ?? ''}
             editable={false}
-            left={
-              current?.css ? (
-                <TextInput.Icon icon={() => <GradientSwatch css={current.css!} width={26} height={16} />} />
-              ) : undefined
-            }
-            right={<TextInput.Icon icon="chevron-down" />}
+            contentStyle={{ paddingLeft: current?.css ? 52 : undefined, paddingRight: 44 }}
           />
+          {current?.css && (
+            <View style={[styles.adornment, { left: 14 }]}>
+              <GradientSwatch css={current.css} width={28} height={18} />
+            </View>
+          )}
+          <View style={[styles.adornment, { right: 14 }]}>
+            <Icon source="chevron-down" size={22} color={theme.colors.onSurfaceVariant} />
+          </View>
         </View>
       </Pressable>
       <Helper text={field.helperText} />
