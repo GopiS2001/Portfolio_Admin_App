@@ -147,16 +147,17 @@ export default function OverviewScreen() {
             copy, so the website keeps working even if the server stops.
           </Text>
 
-          <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
-            <Button
-              label="Open website"
-              icon="open-in-new"
-              variant="contained"
-              onPress={() => Linking.openURL(websiteUrl())}
-              style={{ backgroundColor: '#FFFFFF' }}
-            />
-          </View>
-          {/* Paper's contained button picks the theme colour for its label, so tint it for the white button */}
+          <PaperButton
+            mode="contained"
+            icon="open-in-new"
+            buttonColor="#FFFFFF"
+            textColor={theme.custom.gradient[1]}
+            onPress={() => Linking.openURL(websiteUrl())}
+            style={{ alignSelf: 'flex-start', marginTop: 18, borderRadius: 12 }}
+            contentStyle={{ height: 44 }}
+          >
+            Open website
+          </PaperButton>
         </LinearGradient>
       </View>
 
