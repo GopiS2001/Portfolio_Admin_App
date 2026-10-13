@@ -71,7 +71,7 @@ export default function AccountScreen() {
       </Card>
 
       <Card title="Change password">
-        <PasswordFields form={password} />
+        <FormFields fields={PASSWORD_FIELDS} form={password} />
         <Button label="Change password" loading={savingPassword} onPress={savePassword} style={{ marginTop: 20 }} />
       </Card>
     </Screen>
