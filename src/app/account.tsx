@@ -15,9 +15,9 @@ const ACCOUNT_FIELDS: FieldDef[] = [
 ];
 
 const PASSWORD_FIELDS: FieldDef[] = [
-  { name: 'currentPassword', label: 'Current password', required: true },
-  { name: 'newPassword', label: 'New password', required: true },
-  { name: 'confirmPassword', label: 'Confirm new password', required: true },
+  { name: 'currentPassword', label: 'Current password', type: 'password', required: true },
+  { name: 'newPassword', label: 'New password', type: 'password', required: true },
+  { name: 'confirmPassword', label: 'Confirm new password', type: 'password', required: true },
 ];
 
 export default function AccountScreen() {
