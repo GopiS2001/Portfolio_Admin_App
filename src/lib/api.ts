@@ -7,13 +7,17 @@ import Constants from 'expo-constants';
  * 1. EXPO_PUBLIC_SERVER_URL in App/.env, if set
  * 2. otherwise port 4000 on the computer running `expo start` — the phone already reaches it
  *    over Wi-Fi, so this works in Expo Go without any setup (and follows your LAN IP when it changes).
+ *    With `--tunnel` the dev server address is a public tunnel host, so use the computer's
+ *    LAN IP that app.config.js read at start-up instead.
  * The sign-in screen can override it; that choice is saved on the phone.
  */
 function detectServerUrl() {
   const fromEnv = process.env.EXPO_PUBLIC_SERVER_URL;
   if (fromEnv) return fromEnv.replace(/\/$/, '');
-  const host = Constants.expoConfig?.hostUri?.split(':')[0];
-  return `http://${host || 'localhost'}:4000`;
+  const devHost = Constants.expoConfig?.hostUri?.split(':')[0];
+  const isLocal = !!devHost && (/^\d+\.\d+\.\d+\.\d+$/.test(devHost) || devHost === 'localhost');
+  const lanIp = Constants.expoConfig?.extra?.lanIp as string | undefined;
+  return `http://${(isLocal ? devHost : lanIp) || devHost || 'localhost'}:4000`;
 }
 
 export const DEFAULT_SERVER_URL = detectServerUrl();
