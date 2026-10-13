@@ -1,22 +1,23 @@
 import * as DocumentPicker from 'expo-document-picker';
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
+import { View, Image, Linking, Pressable, StyleSheet, ScrollView } from 'react-native';
 import {
-  View,
   Text,
-  Image,
-  Modal,
+  Chip,
+  Icon,
+  Dialog,
+  Portal,
   Switch,
-  Linking,
-  Pressable,
   TextInput,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+  HelperText,
+  RadioButton,
+  TouchableRipple,
+} from 'react-native-paper';
 
-import { colors, radius } from '@/theme';
+import { useAppTheme } from '@/theme';
 import { uploadFile, resolveFileUrl } from '@/lib/api';
 
-import { Icon, toast, Button, IconButton } from './ui';
+import { toast, Button, IconButton } from './ui';
 
 // ----------------------------------------------------------------------
 
@@ -122,44 +123,64 @@ export function useFieldForm(fields: FieldDef[], source?: Record<string, any> | 
 // ---------------------------------------------------------------------- building blocks
 
 export function FieldLabel({ label, required }: { label: string; required?: boolean }) {
+  const theme = useAppTheme();
   return (
-    <Text style={styles.label}>
+    <Text variant="labelLarge" style={{ color: theme.colors.onSurface, marginBottom: 8 }}>
       {label}
-      {required ? <Text style={{ color: colors.error }}> *</Text> : null}
+      {required ? <Text style={{ color: theme.colors.error }}> *</Text> : null}
     </Text>
   );
 }
 
 export function Helper({ text, error }: { text?: string; error?: string }) {
   if (!error && !text) return null;
-  return <Text style={[styles.helper, error ? { color: colors.error } : null]}>{error || text}</Text>;
+  return (
+    <HelperText type={error ? 'error' : 'info'} visible style={styles.helper}>
+      {error || text}
+    </HelperText>
+  );
 }
 
-export function Input(props: React.ComponentProps<typeof TextInput> & { invalid?: boolean }) {
-  const { invalid, style, ...rest } = props;
+/** Outlined Material text field with a floating label. */
+export function Input(
+  props: Omit<React.ComponentProps<typeof TextInput>, 'mode' | 'error'> & { invalid?: boolean }
+) {
+  const theme = useAppTheme();
+  const { invalid, style, multiline, ...rest } = props;
   return (
     <TextInput
-      placeholderTextColor={colors.textDisabled}
+      mode="outlined"
+      error={invalid}
+      multiline={multiline}
+      outlineStyle={{ borderRadius: 14, borderWidth: 1 }}
+      outlineColor={theme.colors.outline}
+      activeOutlineColor={theme.colors.primary}
+      placeholderTextColor={theme.colors.onSurfaceVariant}
       {...rest}
       style={[
-        styles.input,
-        rest.multiline && { minHeight: 96, textAlignVertical: 'top', paddingTop: 12 },
-        invalid && { borderColor: colors.error },
+        { backgroundColor: theme.colors.surface, fontSize: 15 },
+        multiline && { minHeight: 110 },
         style,
       ]}
     />
   );
 }
 
-/** Three colour stripes standing in for a CSS gradient. */
-export function GradientSwatch({ css, width = 36, height = 18 }: { css: string; width?: number; height?: number }) {
-  const stops = css.split(',').map((c) => c.trim());
+/** The website's gradient covers (`css` is the comma-separated colour stops). */
+export function GradientSwatch({
+  css,
+  width = 36,
+  height = 18,
+  radius = 6,
+}: {
+  css: string;
+  width?: number;
+  height?: number;
+  radius?: number;
+}) {
+  const stops = css.split(',').map((c) => c.trim()) as [string, string, ...string[]];
   return (
-    <View style={{ width, height, borderRadius: 5, overflow: 'hidden', flexDirection: 'row' }}>
-      {stops.map((c, i) => (
-        <View key={i} style={{ flex: 1, backgroundColor: c }} />
-      ))}
-    </View>
+    <LinearGradient colors={stops} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width, height, borderRadius: radius }} />
   );
 }
 
@@ -175,20 +196,7 @@ type FieldProps = {
 export function FormField({ field, value, error, onChange }: FieldProps) {
   switch (field.type) {
     case 'switch':
-      return (
-        <Pressable style={styles.switchRow} onPress={() => onChange(!value)}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.switchLabel}>{field.label}</Text>
-            <Helper text={field.helperText} />
-          </View>
-          <Switch
-            value={!!value}
-            onValueChange={onChange}
-            trackColor={{ true: colors.primary, false: '#C4CDD5' }}
-            thumbColor={colors.white}
-          />
-        </Pressable>
-      );
+      return <SwitchRow label={field.label} helperText={field.helperText} value={!!value} onChange={onChange} />;
     case 'select':
       return <SelectField field={field} value={value} onChange={onChange} />;
     case 'tags':
@@ -199,33 +207,12 @@ export function FormField({ field, value, error, onChange }: FieldProps) {
     case 'file':
       return <UploadField field={field} value={value ?? ''} error={error} onChange={onChange} />;
     case 'color':
-      return (
-        <View>
-          <FieldLabel label={field.label} />
-          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-            <View
-              style={[
-                styles.colorSwatch,
-                { backgroundColor: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : 'transparent' },
-              ]}
-            />
-            <Input
-              style={{ flex: 1 }}
-              value={value ?? ''}
-              onChangeText={onChange}
-              placeholder="#c2410c"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-          <Helper text={field.helperText ?? 'Hex colour, e.g. #c2410c'} />
-        </View>
-      );
+      return <ColorField field={field} value={value ?? ''} onChange={onChange} />;
     default:
       return (
         <View>
-          <FieldLabel label={field.label} required={field.required} />
           <Input
+            label={field.required ? `${field.label} *` : field.label}
             value={value ?? ''}
             onChangeText={onChange}
             placeholder={field.placeholder}
@@ -251,7 +238,7 @@ export function FormFields({
   form: { values: FormValues; errors: Record<string, string>; set: (n: string, v: unknown) => void };
 }) {
   return (
-    <View style={{ gap: 18 }}>
+    <View style={{ gap: 14 }}>
       {fields.map((f) => (
         <FormField
           key={f.name}
@@ -262,6 +249,44 @@ export function FormFields({
         />
       ))}
     </View>
+  );
+}
+
+// ---------------------------------------------------------------------- switch
+
+export function SwitchRow({
+  label,
+  helperText,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  helperText?: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  const theme = useAppTheme();
+  return (
+    <TouchableRipple
+      onPress={() => onChange(!value)}
+      disabled={disabled}
+      borderless
+      style={[styles.switchRow, { backgroundColor: theme.custom.neutral }]}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Text variant="titleSmall">{label}</Text>
+          {helperText && (
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+              {helperText}
+            </Text>
+          )}
+        </View>
+        <Switch value={value} onValueChange={onChange} disabled={disabled} />
+      </View>
+    </TouchableRipple>
   );
 }
 
@@ -276,48 +301,60 @@ export function SelectField({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const theme = useAppTheme();
   const [open, setOpen] = useState(false);
   const options = field.options ?? [];
   const current = options.find((o) => o.value === value);
+  const choose = (v: string) => {
+    onChange(v);
+    setOpen(false);
+  };
 
   return (
     <View>
-      <FieldLabel label={field.label} />
-      <Pressable style={[styles.input, styles.select]} onPress={() => setOpen(true)}>
-        {current?.css && <GradientSwatch css={current.css} />}
-        <Text style={{ flex: 1, color: current ? colors.text : colors.textDisabled, fontSize: 15 }}>
-          {current?.label ?? (value || 'Choose…')}
-        </Text>
-        <Icon name="chevron-down" size={18} color={colors.textSecondary} />
+      <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={field.label}>
+        <View pointerEvents="none">
+          <Input
+            label={field.label}
+            value={current?.label ?? value ?? ''}
+            editable={false}
+            left={
+              current?.css ? (
+                <TextInput.Icon icon={() => <GradientSwatch css={current.css!} width={26} height={16} />} />
+              ) : undefined
+            }
+            right={<TextInput.Icon icon="chevron-down" />}
+          />
+        </View>
       </Pressable>
       <Helper text={field.helperText} />
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>{field.label}</Text>
-            <ScrollView style={{ maxHeight: 420 }}>
-              {options.map((o) => (
-                <Pressable
-                  key={o.value}
-                  style={({ pressed }) => [
-                    styles.option,
-                    (pressed || o.value === value) && { backgroundColor: colors.neutral },
-                  ]}
-                  onPress={() => {
-                    onChange(o.value);
-                    setOpen(false);
-                  }}
-                >
-                  {o.css && <GradientSwatch css={o.css} />}
-                  <Text style={{ flex: 1, fontSize: 15, color: colors.text }}>{o.label}</Text>
-                  {o.value === value && <Icon name="checkmark" color={colors.primary} />}
-                </Pressable>
-              ))}
+      <Portal>
+        <Dialog
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          style={{ backgroundColor: theme.colors.surface, borderRadius: 24, maxHeight: '80%' }}
+        >
+          <Dialog.Title>{field.label}</Dialog.Title>
+          <Dialog.ScrollArea style={{ paddingHorizontal: 0, borderColor: theme.custom.divider }}>
+            <ScrollView>
+              <RadioButton.Group value={value} onValueChange={choose}>
+                {options.map((o) => (
+                  <TouchableRipple key={o.value} onPress={() => choose(o.value)}>
+                    <View style={styles.option}>
+                      <RadioButton value={o.value} />
+                      {o.css && <GradientSwatch css={o.css} width={30} height={18} />}
+                      <Text variant="bodyLarge" style={{ flex: 1 }}>
+                        {o.label}
+                      </Text>
+                    </View>
+                  </TouchableRipple>
+                ))}
+              </RadioButton.Group>
             </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+          </Dialog.ScrollArea>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
@@ -337,32 +374,27 @@ function TagsField({ field, value, onChange }: { field: FieldDef; value: string[
 
   return (
     <View>
-      <FieldLabel label={field.label} />
-      {value.length > 0 && (
-        <View style={styles.tagWrap}>
-          {value.map((t) => (
-            <Pressable
-              key={t}
-              style={styles.tag}
-              onPress={() => onChange(value.filter((x) => x !== t))}
-              accessibilityLabel={`Remove ${t}`}
-            >
-              <Text style={{ fontSize: 13, color: colors.text }}>{t}</Text>
-              <Icon name="close-circle" size={15} color={colors.textDisabled} />
-            </Pressable>
-          ))}
-        </View>
-      )}
       <Input
+        label={field.label}
         value={draft}
         onChangeText={(t) => (t.endsWith(',') ? add(t) : setDraft(t))}
         onSubmitEditing={() => add(draft)}
         onBlur={() => draft.trim() && add(draft)}
         submitBehavior="submit"
         returnKeyType="done"
-        placeholder={field.placeholder ?? 'Type and press Enter (or comma)'}
+        placeholder={field.placeholder ?? 'Type and press Enter'}
+        right={draft.trim() ? <TextInput.Icon icon="plus-circle" onPress={() => add(draft)} /> : undefined}
       />
-      <Helper text={field.helperText ?? 'Tap a tag to remove it.'} />
+      {value.length > 0 && (
+        <View style={styles.tagWrap}>
+          {value.map((t) => (
+            <Chip key={t} compact onClose={() => onChange(value.filter((x) => x !== t))} style={{ borderRadius: 10 }}>
+              {t}
+            </Chip>
+          ))}
+        </View>
+      )}
+      <Helper text={field.helperText ?? 'Press Enter or type a comma to add. Tap × to remove.'} />
     </View>
   );
 }
@@ -372,20 +404,33 @@ function TagsField({ field, value, onChange }: { field: FieldDef; value: string[
 type LinkRow = { label: string; url: string };
 
 function LinksField({ field, value, onChange }: { field: FieldDef; value: LinkRow[]; onChange: (v: LinkRow[]) => void }) {
+  const theme = useAppTheme();
   const update = (i: number, patch: Partial<LinkRow>) =>
     onChange(value.map((row, j) => (j === i ? { ...row, ...patch } : row)));
 
   return (
     <View style={{ gap: 10 }}>
       <View>
-        <FieldLabel label={field.label} />
-        <Helper text={field.helperText} />
+        <Text variant="titleSmall">{field.label}</Text>
+        {field.helperText && (
+          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+            {field.helperText}
+          </Text>
+        )}
       </View>
       {value.map((row, i) => (
-        <View key={i} style={styles.linkRow}>
+        <View key={i} style={[styles.linkRow, { backgroundColor: theme.custom.neutral }]}>
           <View style={{ flex: 1, gap: 8 }}>
-            <Input value={row.label} onChangeText={(t) => update(i, { label: t })} placeholder="Button label (Admin dashboard)" />
             <Input
+              dense
+              label="Button label"
+              value={row.label}
+              onChangeText={(t) => update(i, { label: t })}
+              placeholder="Admin dashboard"
+            />
+            <Input
+              dense
+              label="URL"
               value={row.url}
               onChangeText={(t) => update(i, { url: t })}
               placeholder="https://admin.example.com"
@@ -394,9 +439,9 @@ function LinksField({ field, value, onChange }: { field: FieldDef; value: LinkRo
             />
           </View>
           <IconButton
-            icon="trash-outline"
+            icon="trash-can-outline"
             label="Remove link"
-            color={colors.error}
+            color={theme.colors.error}
             onPress={() => onChange(value.filter((_, j) => j !== i))}
           />
         </View>
@@ -404,7 +449,7 @@ function LinksField({ field, value, onChange }: { field: FieldDef; value: LinkRo
       <Button
         size="small"
         variant="soft"
-        icon="add"
+        icon="plus"
         label="Add link"
         onPress={() => onChange([...value, { label: '', url: '' }])}
         style={{ alignSelf: 'flex-start' }}
@@ -413,10 +458,53 @@ function LinksField({ field, value, onChange }: { field: FieldDef; value: LinkRo
   );
 }
 
+// ---------------------------------------------------------------------- colour
+
+function ColorField({ field, value, onChange }: { field: FieldDef; value: string; onChange: (v: string) => void }) {
+  const theme = useAppTheme();
+  const valid = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+  return (
+    <View>
+      <Input
+        label={field.label}
+        value={value}
+        onChangeText={onChange}
+        placeholder="#c2410c"
+        autoCapitalize="none"
+        autoCorrect={false}
+        left={
+          <TextInput.Icon
+            icon={() => (
+              <View
+                style={[
+                  styles.colorDot,
+                  { backgroundColor: valid ? value : 'transparent', borderColor: theme.colors.outline },
+                ]}
+              />
+            )}
+          />
+        }
+      />
+      <Helper text={field.helperText ?? 'Hex colour, e.g. #c2410c'} />
+    </View>
+  );
+}
+
 // ---------------------------------------------------------------------- upload
 
 /** URL text field with an upload button — paste a link or upload a file from the phone. */
-function UploadField({ field, value, error, onChange }: { field: FieldDef; value: string; error?: string; onChange: (v: string) => void }) {
+function UploadField({
+  field,
+  value,
+  error,
+  onChange,
+}: {
+  field: FieldDef;
+  value: string;
+  error?: string;
+  onChange: (v: string) => void;
+}) {
+  const theme = useAppTheme();
   const [uploading, setUploading] = useState(false);
   const isImage = field.type === 'image';
 
@@ -438,34 +526,60 @@ function UploadField({ field, value, error, onChange }: { field: FieldDef; value
   };
 
   const preview = resolveFileUrl(value);
+  const fileName = value ? value.split('/').pop() : 'Nothing uploaded';
 
   return (
-    <View>
-      <FieldLabel label={field.label} />
-      <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-        {isImage && (
-          <View style={styles.thumb}>
-            {preview ? (
-              <Image source={{ uri: preview }} style={{ width: '100%', height: '100%' }} />
-            ) : (
-              <Icon name="image-outline" color={colors.textDisabled} />
-            )}
-          </View>
-        )}
-        <Input
-          style={{ flex: 1 }}
-          value={value}
-          onChangeText={onChange}
-          placeholder="https://… or upload"
-          autoCapitalize="none"
-          autoCorrect={false}
-          invalid={!!error}
-        />
+    <View style={[styles.upload, { borderColor: theme.colors.outline }]}>
+      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+        <View style={[styles.thumb, { backgroundColor: theme.custom.neutral }]}>
+          {isImage && preview ? (
+            <Image source={{ uri: preview }} style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <Icon
+              source={isImage ? 'image-outline' : value ? 'file-check-outline' : 'file-upload-outline'}
+              size={26}
+              color={value ? theme.colors.primary : theme.colors.onSurfaceVariant}
+            />
+          )}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text variant="titleSmall">{field.label}</Text>
+          <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+            {fileName}
+          </Text>
+        </View>
       </View>
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-        <Button size="small" variant="soft" icon="cloud-upload-outline" label="Upload file" loading={uploading} onPress={pick} />
+
+      <Input
+        dense
+        label="URL"
+        value={value}
+        onChangeText={onChange}
+        placeholder="https://… or upload"
+        autoCapitalize="none"
+        autoCorrect={false}
+        invalid={!!error}
+        style={{ marginTop: 12 }}
+      />
+
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+        <Button
+          size="small"
+          variant="soft"
+          icon="cloud-upload-outline"
+          label={uploading ? 'Uploading…' : 'Upload'}
+          loading={uploading}
+          onPress={pick}
+        />
         {!isImage && !!preview && (
-          <Button size="small" variant="outlined" tone="default" icon="open-outline" label="Open" onPress={() => Linking.openURL(preview)} />
+          <Button
+            size="small"
+            variant="outlined"
+            tone="default"
+            icon="open-in-new"
+            label="Open"
+            onPress={() => Linking.openURL(preview)}
+          />
         )}
         {!!value && (
           <Button size="small" variant="text" tone="error" icon="close" label="Clear" onPress={() => onChange('')} />
@@ -479,62 +593,17 @@ function UploadField({ field, value, error, onChange }: { field: FieldDef; value
 // ----------------------------------------------------------------------
 
 const styles = StyleSheet.create({
-  label: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: 6 },
-  helper: { fontSize: 12, color: colors.textSecondary, marginTop: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: 'rgba(145, 158, 171, 0.32)',
-    borderRadius: radius.sm,
-    paddingHorizontal: 12,
-    minHeight: 48,
-    fontSize: 15,
-    color: colors.text,
-    backgroundColor: colors.paper,
-  },
-  select: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  switchLabel: { fontSize: 15, color: colors.text },
-  colorSwatch: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.divider,
-  },
-  backdrop: { flex: 1, backgroundColor: 'rgba(22, 28, 36, 0.48)', justifyContent: 'flex-end' },
-  sheet: {
-    backgroundColor: colors.paper,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    paddingBottom: 32,
-    paddingTop: 8,
-  },
-  sheetTitle: { fontSize: 16, fontWeight: '700', padding: 16, color: colors.text },
-  option: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 14 },
-  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(145, 158, 171, 0.16)',
-    borderRadius: 14,
-    paddingLeft: 10,
-    paddingRight: 6,
-    paddingVertical: 5,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral,
-  },
+  helper: { paddingHorizontal: 4, paddingTop: 2, paddingBottom: 0 },
+  switchRow: { borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 6 },
+  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
+  linkRow: { flexDirection: 'row', gap: 8, alignItems: 'center', padding: 10, borderRadius: 14 },
+  colorDot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1 },
+  upload: { borderWidth: 1, borderStyle: 'dashed', borderRadius: 16, padding: 14 },
   thumb: {
     width: 56,
     height: 56,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
