@@ -4,19 +4,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { Text, Badge } from 'react-native-paper';
 
-import { useAppTheme } from '@/theme';
+import { FONT, useAppTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
 type TabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>>[0];
 
-/** Floating pill tab bar: the active tab gets a tinted pill behind its icon. */
+/**
+ * Floating capsule tab bar. The active tab sits in its own rounded inner capsule
+ * (fine border + soft shadow) with a bold label; the others are icon + plain label.
+ */
 export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 10) + 6 }]}>
+    <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 10) + 4 }]}>
       <View
         style={[
           styles.bar,
@@ -30,7 +33,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
-          const color = focused ? theme.colors.primary : theme.colors.onSurfaceVariant;
+          const color = focused ? theme.colors.primary : theme.colors.onSurface;
           const label = typeof options.title === 'string' ? options.title : route.name;
           const badge = options.tabBarBadge;
 
@@ -47,23 +50,39 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
               accessibilityRole="tab"
               accessibilityState={{ selected: focused }}
               accessibilityLabel={label}
-              style={styles.item}
+              style={({ pressed }) => [styles.item, pressed && !focused && { opacity: 0.6 }]}
             >
-              <View style={[styles.pill, focused && { backgroundColor: theme.colors.primaryContainer }]}>
-                {options.tabBarIcon?.({ focused, color, size: 22 })}
-                {badge !== undefined && (
-                  <Badge size={17} style={[styles.badge, { backgroundColor: theme.colors.error }]}>
-                    {badge}
-                  </Badge>
-                )}
-              </View>
-              <Text
-                variant="labelSmall"
-                numberOfLines={1}
-                style={{ color, marginTop: 3, opacity: focused ? 1 : 0.85 }}
+              <View
+                style={[
+                  styles.capsule,
+                  focused && [
+                    styles.capsuleActive,
+                    {
+                      backgroundColor: theme.dark ? theme.colors.elevation.level3 : theme.colors.surface,
+                      borderColor: theme.colors.outlineVariant,
+                      shadowColor: theme.custom.cardShadow,
+                    },
+                  ],
+                ]}
               >
-                {label}
-              </Text>
+                <View>
+                  {options.tabBarIcon?.({ focused, color, size: 26 })}
+                  {badge !== undefined && (
+                    <Badge size={17} style={[styles.badge, { backgroundColor: theme.colors.error }]}>
+                      {badge}
+                    </Badge>
+                  )}
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.label,
+                    { color, fontFamily: focused ? FONT.bold : FONT.medium },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </View>
             </Pressable>
           );
         })}
@@ -73,19 +92,34 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 14, right: 14 },
+  wrap: { position: 'absolute', left: 12, right: 12 },
   bar: {
     flexDirection: 'row',
-    borderRadius: 28,
+    alignItems: 'center',
+    borderRadius: 40,
     borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    shadowOpacity: 0.16,
+    padding: 6,
+    shadowOpacity: 0.14,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 10 },
     elevation: 12,
   },
-  item: { flex: 1, alignItems: 'center' },
-  pill: { width: 58, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  badge: { position: 'absolute', top: -4, right: 6 },
+  item: { flex: 1 },
+  capsule: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    paddingVertical: 9,
+    borderRadius: 34,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  capsuleActive: {
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  label: { fontSize: 12, lineHeight: 16 },
+  badge: { position: 'absolute', top: -5, right: -10 },
 });
