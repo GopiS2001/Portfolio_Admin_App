@@ -49,10 +49,12 @@ export const setUnauthorizedHandler = (handler: (() => void) | null) => {
   onUnauthorized = handler;
 };
 
-/** Public website for "Open website" / "Preview": port 3000 on the API host. */
+/** Public website for "Open website" / "Preview": EXPO_PUBLIC_WEBSITE_URL, else port 3000 on the API host. */
 export const websiteUrl = (anchor?: string) => {
+  const configured = process.env.EXPO_PUBLIC_WEBSITE_URL?.replace(/\/$/, '');
   const url = new URL(serverUrl);
-  return `${url.protocol}//${url.hostname}:3000${anchor ? `/#${anchor}` : ''}`;
+  const base = configured || `${url.protocol}//${url.hostname}:3000`;
+  return `${base}${anchor ? `/#${anchor}` : ''}`;
 };
 
 /**
