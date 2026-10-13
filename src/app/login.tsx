@@ -14,6 +14,7 @@ export default function LoginScreen() {
   const { signIn, serverUrl } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [server, setServer] = useState(serverUrl);
   const [showServer, setShowServer] = useState(false);
   const [error, setError] = useState('');
