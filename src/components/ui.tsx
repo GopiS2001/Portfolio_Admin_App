@@ -95,6 +95,140 @@ export function Screen({
   );
 }
 
+/** Height kept free at the bottom of tab screens for the floating tab bar. */
+export const TAB_BAR_SPACE = 112;
+
+// ---------------------------------------------------------------------- Tab header
+
+/** Large title header for tab screens (sits inside the scroll, under the status bar). */
+export function TabHeader({
+  overline,
+  title,
+  subtitle,
+  right,
+}: {
+  overline?: string;
+  title: string;
+  subtitle?: string;
+  right?: React.ReactNode;
+}) {
+  const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.tabHeader, { paddingTop: insets.top + 14 }]}>
+      <View style={{ flex: 1 }}>
+        {overline && (
+          <Text variant="labelMedium" style={{ color: theme.colors.primary, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+            {overline}
+          </Text>
+        )}
+        <Text variant="headlineLarge" style={{ marginTop: overline ? 2 : 0 }}>
+          {title}
+        </Text>
+        {subtitle && (
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+            {subtitle}
+          </Text>
+        )}
+      </View>
+      {right}
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------- Gradient tile / avatar / ring
+
+/** Icon on a gradient square — the premium version of IconTile. */
+export function GradientTile({
+  icon,
+  tile = 'emerald',
+  size = 44,
+  iconSize,
+}: {
+  icon: IconName;
+  tile?: TileKey;
+  size?: number;
+  iconSize?: number;
+}) {
+  return (
+    <LinearGradient
+      colors={TILES[tile]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.tile, { width: size, height: size, borderRadius: size * 0.32 }]}
+    >
+      <Icon source={icon} size={iconSize ?? size * 0.5} color="#FFFFFF" />
+    </LinearGradient>
+  );
+}
+
+const AVATAR_TILES: TileKey[] = ['emerald', 'sky', 'violet', 'amber', 'rose', 'teal'];
+
+export const initials = (name?: string) =>
+  (name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]!.toUpperCase())
+    .join('') || '?';
+
+/** Initials on a gradient circle; the colour is stable per name. */
+export function GradientAvatar({ name, size = 44, muted }: { name?: string; size?: number; muted?: boolean }) {
+  const hash = [...(name ?? '')].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const tile = muted ? 'slate' : AVATAR_TILES[hash % AVATAR_TILES.length];
+  return (
+    <LinearGradient
+      colors={TILES[tile]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.tile, { width: size, height: size, borderRadius: size / 2 }]}
+    >
+      <Text style={{ color: '#FFFFFF', fontFamily: FONT.bold, fontSize: size * 0.36 }}>{initials(name)}</Text>
+    </LinearGradient>
+  );
+}
+
+/** Circular progress ring with content in the middle. */
+export function ProgressRing({
+  progress,
+  size = 96,
+  stroke = 9,
+  color = '#FFFFFF',
+  track = 'rgba(255,255,255,0.18)',
+  children,
+}: {
+  progress: number;
+  size?: number;
+  stroke?: number;
+  color?: string;
+  track?: string;
+  children?: React.ReactNode;
+}) {
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const p = Math.max(0, Math.min(1, progress));
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={track} strokeWidth={stroke} fill="none" />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color}
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={`${c} ${c}`}
+          strokeDashoffset={c * (1 - p)}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </Svg>
+      {children}
+    </View>
+  );
+}
+
 // ---------------------------------------------------------------------- Card
 
 /** Elevated card with an optional header (icon tile, title, subtitle, action). */
