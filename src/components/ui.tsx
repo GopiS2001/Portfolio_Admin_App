@@ -21,7 +21,15 @@ import { websiteUrl } from '@/lib/api';
 
 export type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
-export function Icon({ name, size = 20, color = colors.text }: { name: IconName; size?: number; color?: string }) {
+export function Icon({
+  name,
+  size = 20,
+  color = colors.text,
+}: {
+  name: IconName;
+  size?: number;
+  color?: React.ComponentProps<typeof Ionicons>['color'];
+}) {
   return <Ionicons name={name} size={size} color={color} />;
 }
 
