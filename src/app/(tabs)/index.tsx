@@ -15,7 +15,7 @@ import { Icon, Card, Label, Button, Screen, Divider, ErrorBanner } from '@/compo
 
 // ----------------------------------------------------------------------
 
-export function timeAgo(date: string) {
+function timeAgo(date: string) {
   const s = Math.max(0, (Date.now() - new Date(date).getTime()) / 1000);
   if (s < 60) return 'just now';
   const units: [number, string][] = [
