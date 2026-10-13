@@ -15,11 +15,13 @@ export function SingletonForm<T extends Record<string, any>>({
   url,
   title,
   subheader,
+  icon,
   fields,
 }: {
   url: string;
   title: string;
   subheader?: string;
+  icon?: string;
   fields: FieldDef[];
 }) {
   const { data, isLoading } = useResource<T>(url);
@@ -40,7 +42,7 @@ export function SingletonForm<T extends Record<string, any>>({
   };
 
   return (
-    <Card title={title} subheader={subheader}>
+    <Card title={title} subheader={subheader} icon={icon}>
       {isLoading ? (
         <Loading />
       ) : (
@@ -67,9 +69,16 @@ export function SaveBar({
   label?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-      <Button variant="outlined" tone="default" label="Discard" disabled={!dirty || saving} onPress={onDiscard} />
-      <Button label={label} disabled={!dirty} loading={saving} onPress={onSave} />
+    <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+      <Button
+        variant="outlined"
+        tone="default"
+        label="Discard"
+        disabled={!dirty || saving}
+        onPress={onDiscard}
+        style={{ flex: 1 }}
+      />
+      <Button icon="check" label={label} disabled={!dirty} loading={saving} onPress={onSave} style={{ flex: 2 }} />
     </View>
   );
 }
