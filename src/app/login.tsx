@@ -131,4 +131,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '800', color: colors.text, textAlign: 'center' },
   subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 },
   server: { fontSize: 13, color: colors.textSecondary },
+  eye: { position: 'absolute', right: 6 },
 });
