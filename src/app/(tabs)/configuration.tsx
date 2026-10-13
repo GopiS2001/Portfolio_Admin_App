@@ -1,17 +1,37 @@
+import type { TileKey } from '@/theme';
 import type { FieldDef } from '@/components/fields';
 import type { Section, Settings, ThemeMode } from '@/lib/types';
 
+import { router } from 'expo-router';
+import Constants from 'expo-constants';
 import { useMemo, useState } from 'react';
-import { View, Text, Switch, Pressable, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Platform, UIManager, StyleSheet, LayoutAnimation } from 'react-native';
+import { Text, Switch, Surface, ProgressBar, TouchableRipple, SegmentedButtons } from 'react-native-paper';
 
-import { colors, radius } from '@/theme';
+import { useAuth } from '@/lib/auth';
+import { useAppTheme } from '@/theme';
 import { http, endpoints as api } from '@/lib/api';
 import { saveSection } from '@/components/section-heading-card';
-import { SaveBar } from '@/components/singleton-form';
 import { SANS_FONTS, SERIF_FONTS, SECTION_LABELS } from '@/lib/options';
 import { setCache, revalidate, useResource, saveSingleton } from '@/lib/store';
-import { FormFields, FieldLabel, SelectField, useFieldForm } from '@/components/fields';
-import { Card, toast, Button, Screen, Divider, IconButton, WarningBanner } from '@/components/ui';
+import { FormFields, SelectField, useFieldForm } from '@/components/fields';
+import {
+  Icon,
+  toast,
+  Button,
+  Screen,
+  Divider,
+  TabHeader,
+  IconButton,
+  GradientTile,
+  ConfirmDialog,
+  GradientAvatar,
+  TAB_BAR_SPACE,
+} from '@/components/ui';
+
+if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental?.(true);
 
 // ----------------------------------------------------------------------
 
@@ -65,10 +85,10 @@ const CUSTOM_FIELDS: FieldDef[] = [
 
 const ALL_FIELDS = [...SITE_FIELDS, ...HEADER_FIELDS, ...THEME_FIELDS, ...BLOCK_FIELDS, ...CUSTOM_FIELDS];
 
-const THEMES: { value: ThemeMode; label: string }[] = [
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'system', label: 'Follow device' },
+const THEMES: { value: ThemeMode; label: string; icon: string }[] = [
+  { value: 'light', label: 'Light', icon: 'white-balance-sunny' },
+  { value: 'dark', label: 'Dark', icon: 'weather-night' },
+  { value: 'system', label: 'Device', icon: 'cellphone' },
 ];
 
 const fontOptions = (list: string[], def: string) =>
@@ -77,7 +97,12 @@ const fontOptions = (list: string[], def: string) =>
 // ----------------------------------------------------------------------
 
 export default function ConfigurationScreen() {
+  const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
+  const { user, signOut } = useAuth();
   const { data: settings, refresh } = useResource<Settings>(api.settings);
+  const { data: sections } = useResource<Section[]>(api.sections);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   const source = useMemo(
     () =>
@@ -94,6 +119,11 @@ export default function ConfigurationScreen() {
   const form = useFieldForm(ALL_FIELDS, source);
   const [saving, setSaving] = useState(false);
   const v = form.values;
+  const accent = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.accentLight) ? v.accentLight : theme.custom.tones.warning.fg;
+  const headingSize = (Number(v.baseFontSize) * 2.25 * Number(v.headingScale)) / 100;
+  const online = !!v.siteEnabled;
+  const live = sections?.filter((s) => s.visible).length ?? 0;
+  const blocksOn = BLOCK_FIELDS.filter((f) => v[f.name]).length;
 
   const save = async () => {
     setSaving(true);
@@ -108,114 +138,239 @@ export default function ConfigurationScreen() {
   };
 
   return (
-    <Screen
-      anchor=""
-      onRefresh={() => Promise.all([refresh(), revalidate(api.sections)]).catch(() => undefined)}
-    >
-      {settings && !v.siteEnabled && (
-        <WarningBanner message="The website is switched off — visitors see the maintenance message." />
-      )}
+    <View style={{ flex: 1 }}>
+      <Screen
+        tab
+        onRefresh={() => Promise.all([refresh(), revalidate(api.sections)]).catch(() => undefined)}
+        header={<TabHeader overline="Website" title="Settings" subtitle="Control what visitors see and how it looks." />}
+      >
+        {/* Status hero — the switch is part of the form, saved with the bar below */}
+        <View style={[styles.heroShadow, { shadowColor: online ? theme.custom.gradient[1] : '#B71D18' }]}>
+          <LinearGradient
+            colors={online ? theme.custom.gradient : ['#4A0D0D', '#9A2A12', '#E2572B']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hero}
+          >
+            <View style={styles.glow} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+              <View style={styles.heroIcon}>
+                <Icon source={online ? 'web-check' : 'web-off'} size={26} color="#FFFFFF" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text variant="titleLarge" style={{ color: '#FFFFFF' }}>
+                  {online ? 'Website online' : 'Maintenance mode'}
+                </Text>
+                <Text variant="bodySmall" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                  {online ? `${live} of ${sections?.length ?? 0} sections live` : 'Visitors see the maintenance message'}
+                </Text>
+              </View>
+              <Switch
+                value={online}
+                onValueChange={(on) => form.set('siteEnabled', on)}
+                color="#FFFFFF"
+                trackColor={{ true: 'rgba(255,255,255,0.45)', false: 'rgba(255,255,255,0.25)' }}
+              />
+            </View>
+          </LinearGradient>
+        </View>
 
-      <SectionsCard />
+        {/* Account */}
+        <TouchableRipple
+          onPress={() => router.push('/account')}
+          borderless
+          style={[styles.account, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider }]}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <GradientAvatar name={user?.displayName} size={48} />
+            <View style={{ flex: 1 }}>
+              <Text variant="titleMedium">{user?.displayName ?? 'Admin'}</Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                {user?.email} · Account & password
+              </Text>
+            </View>
+            <Icon source="chevron-right" size={22} color={theme.colors.onSurfaceVariant} />
+          </View>
+        </TouchableRipple>
 
-      <Card title="Website" icon="desktop-outline">
-        <FormFields fields={SITE_FIELDS} form={form} />
-      </Card>
+        <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
+          WEBSITE
+        </Text>
 
-      <Card title="Top header" icon="browsers-outline">
-        <FormFields fields={HEADER_FIELDS} form={form} />
-      </Card>
+        <Group icon="format-list-bulleted" tile="emerald" title="Sections & menu" summary={`${live} live · changes apply instantly`} defaultOpen>
+          <SectionsList />
+        </Group>
 
-      <Card title="Blocks" icon="apps-outline">
-        <FormFields fields={BLOCK_FIELDS} form={form} />
-      </Card>
+        <Group icon="information-outline" tile="sky" title="Site details" summary={v.siteTitle || 'Title, SEO & maintenance'}>
+          <FormFields fields={SITE_FIELDS.filter((f) => f.name !== 'siteEnabled')} form={form} />
+        </Group>
 
-      <Card title="Dark & light mode" icon="moon-outline">
-        <View style={{ gap: 18 }}>
-          <FormFields fields={THEME_FIELDS.slice(0, 1)} form={form} />
-          <View>
-            <FieldLabel label="Default theme" />
-            <View style={styles.segment}>
-              {THEMES.map((t) => {
-                const active = v.defaultTheme === t.value;
-                return (
-                  <Pressable
-                    key={t.value}
-                    onPress={() => form.set('defaultTheme', t.value)}
-                    style={[styles.segmentItem, active && styles.segmentActive]}
-                  >
-                    <Text style={[styles.segmentText, active && { color: colors.text }]}>{t.label}</Text>
-                  </Pressable>
-                );
-              })}
+        <Group icon="page-layout-header" tile="violet" title="Top header" summary={v.showHeader ? `Shown · button “${v.headerCtaLabel || '—'}”` : 'Hidden'}>
+          <FormFields fields={HEADER_FIELDS} form={form} />
+        </Group>
+
+        <Group icon="view-dashboard-outline" tile="amber" title="Blocks" summary={`${blocksOn} of ${BLOCK_FIELDS.length} switched on`}>
+          <FormFields fields={BLOCK_FIELDS} form={form} />
+        </Group>
+
+        <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
+          LOOK & FEEL
+        </Text>
+
+        <Group
+          icon="theme-light-dark"
+          tile="rose"
+          title="Appearance"
+          summary={`${THEMES.find((t) => t.value === v.defaultTheme)?.label ?? 'Device'} theme · ${v.enableThemeToggle ? 'toggle on' : 'toggle off'}`}
+        >
+          <View style={{ gap: 16 }}>
+            <FormFields fields={THEME_FIELDS.slice(0, 1)} form={form} />
+            <View>
+              <Text variant="titleSmall" style={{ marginBottom: 10 }}>
+                Default theme
+              </Text>
+              <SegmentedButtons
+                value={v.defaultTheme}
+                onValueChange={(t) => form.set('defaultTheme', t)}
+                buttons={THEMES.map((t) => ({ value: t.value, label: t.label, icon: t.icon }))}
+              />
+            </View>
+            <FormFields fields={THEME_FIELDS.slice(1)} form={form} />
+          </View>
+        </Group>
+
+        <Group icon="format-font" tile="teal" title="Typography" summary={`${v.fontSans} · ${v.fontSerif}`}>
+          <View style={{ gap: 16 }}>
+            <SelectField
+              field={{ label: 'Body font', options: fontOptions(SANS_FONTS, 'Geist') }}
+              value={v.fontSans}
+              onChange={(f) => form.set('fontSans', f)}
+            />
+            <SelectField
+              field={{ label: 'Heading font', options: fontOptions(SERIF_FONTS, 'Instrument Serif') }}
+              value={v.fontSerif}
+              onChange={(f) => form.set('fontSerif', f)}
+            />
+            <Stepper label="Base font size" value={Number(v.baseFontSize)} min={12} max={22} unit="px" onChange={(n) => form.set('baseFontSize', n)} />
+            <Stepper label="Heading size" value={Number(v.headingScale)} min={70} max={140} step={5} unit="%" onChange={(n) => form.set('headingScale', n)} />
+
+            <View style={[styles.preview, { backgroundColor: theme.custom.neutral, borderLeftColor: accent }]}>
+              <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, letterSpacing: 1.5 }}>
+                PREVIEW
+              </Text>
+              <Text style={{ fontFamily: 'serif', fontSize: headingSize, lineHeight: headingSize * 1.15, color: theme.colors.onSurface, marginVertical: 8 }}>
+                Crafting <Text style={{ fontFamily: 'serif', fontStyle: 'italic', color: accent }}>digital experiences</Text>
+              </Text>
+              <Text style={{ fontSize: Number(v.baseFontSize), color: theme.colors.onSurfaceVariant }}>
+                I design and build fast, accessible, beautifully crafted web products.
+              </Text>
             </View>
           </View>
-          <FormFields fields={THEME_FIELDS.slice(1)} form={form} />
-        </View>
-      </Card>
+        </Group>
 
-      <Card title="Typography" icon="text-outline">
-        <View style={{ gap: 18 }}>
-          <SelectField
-            field={{ label: 'Body font', options: fontOptions(SANS_FONTS, 'Geist') }}
-            value={v.fontSans}
-            onChange={(f) => form.set('fontSans', f)}
-          />
-          <SelectField
-            field={{ label: 'Heading font', options: fontOptions(SERIF_FONTS, 'Instrument Serif') }}
-            value={v.fontSerif}
-            onChange={(f) => form.set('fontSerif', f)}
-          />
-          <Stepper
-            label="Base font size"
-            value={Number(v.baseFontSize)}
-            min={12}
-            max={22}
-            unit="px"
-            onChange={(n) => form.set('baseFontSize', n)}
-          />
-          <Stepper
-            label="Heading size"
-            value={Number(v.headingScale)}
-            min={70}
-            max={140}
-            step={5}
-            unit="%"
-            onChange={(n) => form.set('headingScale', n)}
-          />
-
-          <View style={styles.preview}>
-            <Text style={styles.overline}>PREVIEW</Text>
-            <Text
-              style={{
-                fontFamily: 'serif',
-                fontSize: (Number(v.baseFontSize) * 2.25 * Number(v.headingScale)) / 100,
-                lineHeight: (Number(v.baseFontSize) * 2.25 * Number(v.headingScale) * 1.15) / 100,
-                color: colors.text,
-                marginVertical: 8,
-              }}
-            >
-              Crafting <Text style={{ fontStyle: 'italic', color: v.accentLight || colors.warningDark }}>digital experiences</Text>
-            </Text>
-            <Text style={{ fontSize: Number(v.baseFontSize), color: colors.textSecondary }}>
-              I design and build fast, accessible, beautifully crafted web products.
-            </Text>
-            <Text style={[styles.overline, { marginTop: 10, letterSpacing: 0 }]}>
-              {v.fontSans} · {v.fontSerif} (shown in the system font here)
-            </Text>
-          </View>
-        </View>
-      </Card>
-
-      <Card>
-        <Text style={{ fontSize: 13, color: colors.textSecondary }}>
-          {form.isDirty ? 'You have unsaved changes.' : 'All changes saved.'}
+        <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
+          DATA
         </Text>
-        <SaveBar dirty={form.isDirty} saving={saving} onDiscard={form.reset} onSave={save} label="Save configuration" />
-      </Card>
 
-      <SnapshotCard updatedAt={settings?.updatedAt} />
-    </Screen>
+        <Group icon="cloud-download-outline" tile="slate" title="Offline copy" summary="Snapshot used when the server is down">
+          <SnapshotPanel updatedAt={settings?.updatedAt} />
+        </Group>
+
+        <Button variant="soft" tone="error" icon="logout" label="Sign out" onPress={() => setConfirmSignOut(true)} style={{ marginTop: 8 }} />
+        <Text variant="bodySmall" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
+          Portfolio Admin · v{Constants.expoConfig?.version ?? '1.0.0'}
+        </Text>
+        {form.isDirty && <View style={{ height: 64 }} />}
+      </Screen>
+
+      {form.isDirty && (
+        <Surface
+          elevation={5}
+          style={[
+            styles.saveBar,
+            { backgroundColor: theme.colors.inverseSurface, bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 30 },
+          ]}
+        >
+          <Icon source="pencil-circle" size={22} color={theme.colors.inversePrimary} />
+          <Text variant="labelLarge" style={{ flex: 1, color: theme.colors.inverseOnSurface }}>
+            Unsaved changes
+          </Text>
+          <PaperButton compact textColor={theme.colors.inverseOnSurface} onPress={form.reset} disabled={saving}>
+            Discard
+          </PaperButton>
+          <Button size="small" icon="check" label="Save" loading={saving} onPress={save} />
+        </Surface>
+      )}
+
+      <ConfirmDialog
+        visible={confirmSignOut}
+        title="Sign out?"
+        content="You will need your email and password to sign in again."
+        confirmLabel="Sign out"
+        icon="logout"
+        onConfirm={signOut}
+        onDismiss={() => setConfirmSignOut(false)}
+      />
+    </View>
+  );
+}
+
+// ----------------------------------------------------------------------
+
+/** Collapsible settings group: gradient icon, title, live summary, chevron. */
+function Group({
+  icon,
+  tile,
+  title,
+  summary,
+  defaultOpen,
+  children,
+}: {
+  icon: string;
+  tile: TileKey;
+  title: string;
+  summary?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const theme = useAppTheme();
+  const [open, setOpen] = useState(!!defaultOpen);
+
+  const toggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setOpen((o) => !o);
+  };
+
+  return (
+    <Surface
+      elevation={1}
+      style={[styles.group, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider, shadowColor: theme.custom.cardShadow }]}
+    >
+      <View style={{ borderRadius: 22, overflow: 'hidden' }}>
+        <TouchableRipple onPress={toggle}>
+          <View style={styles.groupHeader}>
+            <GradientTile icon={icon} tile={tile} size={42} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text variant="titleMedium">{title}</Text>
+              {summary && (
+                <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
+                  {summary}
+                </Text>
+              )}
+            </View>
+            <View style={[styles.chevron, { backgroundColor: theme.custom.neutral, transform: [{ rotate: open ? '180deg' : '0deg' }] }]}>
+              <Icon source="chevron-down" size={20} color={theme.colors.onSurfaceVariant} />
+            </View>
+          </View>
+        </TouchableRipple>
+        {open && (
+          <>
+            <Divider />
+            <View style={{ padding: 16 }}>{children}</View>
+          </>
+        )}
+      </View>
+    </Surface>
   );
 }
 
@@ -238,31 +393,47 @@ function Stepper({
   unit: string;
   onChange: (n: number) => void;
 }) {
-  const pct = ((value - min) / (max - min)) * 100;
+  const theme = useAppTheme();
   return (
-    <View>
+    <View style={[styles.stepper, { backgroundColor: theme.custom.neutral }]}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text }}>{label}</Text>
+        <Text variant="titleSmall">{label}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <IconButton icon="remove-circle-outline" label={`Decrease ${label}`} color={colors.primary} size={26} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} />
-          <Text style={{ minWidth: 52, textAlign: 'center', fontSize: 15, fontWeight: '700', color: colors.primary }}>
+          <IconButton
+            tonal
+            icon="minus"
+            label={`Decrease ${label}`}
+            size={18}
+            disabled={value <= min}
+            onPress={() => onChange(Math.max(min, value - step))}
+          />
+          <Text variant="titleMedium" style={{ minWidth: 56, textAlign: 'center', color: theme.colors.primary }}>
             {value}
             {unit}
           </Text>
-          <IconButton icon="add-circle-outline" label={`Increase ${label}`} color={colors.primary} size={26} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} />
+          <IconButton
+            tonal
+            icon="plus"
+            label={`Increase ${label}`}
+            size={18}
+            disabled={value >= max}
+            onPress={() => onChange(Math.min(max, value + step))}
+          />
         </View>
       </View>
-      <View style={styles.track}>
-        <View style={[styles.trackFill, { width: `${Math.max(0, Math.min(100, pct))}%` }]} />
-      </View>
+      <ProgressBar
+        progress={Math.max(0, Math.min(1, (value - min) / (max - min)))}
+        style={{ height: 6, borderRadius: 3, marginTop: 10 }}
+      />
     </View>
   );
 }
 
 // ----------------------------------------------------------------------
 
-/** One row per website section: on/off, in-nav, order. Saves immediately. */
-function SectionsCard() {
+/** One row per website section: on/off, in-menu, order. Saves immediately. */
+function SectionsList() {
+  const theme = useAppTheme();
   const { data } = useResource<Section[]>(api.sections);
   const sections = data ?? [];
 
@@ -292,49 +463,47 @@ function SectionsCard() {
     }
   };
 
-  const sw = { trackColor: { true: colors.primary, false: '#C4CDD5' }, thumbColor: colors.white };
-
   return (
-    <Card
-      title="Website sections"
-      subheader="Switch pages on/off, choose what appears in the top menu and set the order. Changes apply instantly."
-      icon="list-outline"
-      padded={false}
-    >
-      <View style={[styles.sectionRow, { paddingVertical: 8 }]}>
-        <Text style={[styles.overline, { width: 64 }]}>ORDER</Text>
-        <Text style={[styles.overline, { flex: 1 }]}>SECTION</Text>
-        <Text style={[styles.overline, styles.col]}>SITE</Text>
-        <Text style={[styles.overline, styles.col]}>MENU</Text>
-      </View>
+    <View style={{ gap: 10 }}>
       {sections.map((s, i) => (
-        <View key={s.key}>
-          <Divider dashed />
-          <View style={styles.sectionRow}>
-            <View style={{ width: 64, flexDirection: 'row' }}>
-              <IconButton icon="chevron-up" label="Move up" size={18} disabled={i === 0} onPress={() => move(i, -1)} />
-              <IconButton icon="chevron-down" label="Move down" size={18} disabled={i === sections.length - 1} onPress={() => move(i, 1)} />
+        <View key={s.key} style={[styles.sectionRow, { backgroundColor: theme.custom.neutral, opacity: s.visible ? 1 : 0.7 }]}>
+          <View style={{ alignItems: 'center' }}>
+            <IconButton icon="chevron-up" label="Move up" size={18} disabled={i === 0} onPress={() => move(i, -1)} />
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginVertical: -4 }}>
+              {i + 1}
+            </Text>
+            <IconButton icon="chevron-down" label="Move down" size={18} disabled={i === sections.length - 1} onPress={() => move(i, 1)} />
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="titleSmall">{SECTION_LABELS[s.key]}</Text>
+            <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
+              Menu label: {s.navLabel || '—'}
+            </Text>
+          </View>
+          <View style={{ gap: 4 }}>
+            <View style={styles.switchLine}>
+              <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                Site
+              </Text>
+              <Switch value={s.visible} onValueChange={() => toggle(s, 'visible')} />
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{SECTION_LABELS[s.key]}</Text>
-              <Text style={{ fontSize: 12, color: colors.textSecondary }}>Menu: {s.navLabel || '—'}</Text>
-            </View>
-            <View style={styles.col}>
-              <Switch value={s.visible} onValueChange={() => toggle(s, 'visible')} {...sw} />
-            </View>
-            <View style={styles.col}>
-              <Switch value={s.showInNav} disabled={!s.visible} onValueChange={() => toggle(s, 'showInNav')} {...sw} />
+            <View style={styles.switchLine}>
+              <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                Menu
+              </Text>
+              <Switch value={s.showInNav} disabled={!s.visible} onValueChange={() => toggle(s, 'showInNav')} />
             </View>
           </View>
         </View>
       ))}
-    </Card>
+    </View>
   );
 }
 
 // ----------------------------------------------------------------------
 
-function SnapshotCard({ updatedAt }: { updatedAt?: string }) {
+function SnapshotPanel({ updatedAt }: { updatedAt?: string }) {
+  const theme = useAppTheme();
   const [busy, setBusy] = useState(false);
 
   const rebuild = async () => {
@@ -350,42 +519,62 @@ function SnapshotCard({ updatedAt }: { updatedAt?: string }) {
   };
 
   return (
-    <Card
-      title="Offline copy"
-      subheader="Every save also writes a static snapshot of the whole site. If the backend or MySQL stops, the website keeps showing exactly this data."
-      icon="cloud-download-outline"
-    >
+    <View style={{ gap: 12 }}>
+      <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+        Every save also writes a static snapshot of the whole site. If the backend or MySQL stops, the website
+        keeps showing exactly this data.
+      </Text>
       <Button variant="soft" icon="refresh" label="Rebuild now" loading={busy} onPress={rebuild} />
       {updatedAt && (
-        <Text style={{ fontSize: 12, color: colors.textDisabled, marginTop: 10 }}>
+        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
           Settings last changed {new Date(updatedAt).toLocaleString()}
         </Text>
       )}
-    </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  segment: {
+  heroShadow: { borderRadius: 26, shadowOpacity: 0.3, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 6 },
+  hero: { padding: 18, borderRadius: 26, overflow: 'hidden' },
+  glow: {
+    position: 'absolute',
+    right: -50,
+    top: -70,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  heroIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  account: { padding: 16, borderRadius: 22, borderWidth: StyleSheet.hairlineWidth },
+  groupLabel: { letterSpacing: 1.2, paddingHorizontal: 6, marginTop: 6, marginBottom: -6 },
+  group: { borderRadius: 22, borderWidth: StyleSheet.hairlineWidth, shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 6 } },
+  groupHeader: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 },
+  chevron: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  preview: { padding: 18, borderRadius: 16, borderLeftWidth: 3 },
+  stepper: { padding: 14, borderRadius: 14 },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingVertical: 4, paddingLeft: 4, paddingRight: 12 },
+  switchLine: { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'flex-end' },
+  saveBar: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
     flexDirection: 'row',
-    backgroundColor: colors.neutral,
-    borderRadius: radius.sm,
-    padding: 4,
-    gap: 4,
+    alignItems: 'center',
+    gap: 8,
+    paddingLeft: 16,
+    paddingRight: 8,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  segmentItem: { flex: 1, paddingVertical: 10, borderRadius: 6, alignItems: 'center' },
-  segmentActive: {
-    backgroundColor: colors.paper,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  segmentText: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
-  preview: { padding: 16, borderRadius: radius.md, backgroundColor: colors.neutral },
-  overline: { fontSize: 11, fontWeight: '700', color: colors.textDisabled, letterSpacing: 1 },
-  track: { height: 4, borderRadius: 2, backgroundColor: 'rgba(0,167,111,0.16)', marginTop: 4 },
-  trackFill: { height: 4, borderRadius: 2, backgroundColor: colors.primary },
-  sectionRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8, paddingVertical: 6 },
-  col: { width: 56, alignItems: 'center' },
 });
