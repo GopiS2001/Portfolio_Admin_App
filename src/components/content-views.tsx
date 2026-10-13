@@ -10,9 +10,10 @@ import type {
   AboutParagraph,
 } from '@/lib/types';
 
-import { View, Text, Image } from 'react-native';
+import { View, Image } from 'react-native';
+import { Text } from 'react-native-paper';
 
-import { colors } from '@/theme';
+import { useAppTheme } from '@/theme';
 import { revalidate } from '@/lib/store';
 import { endpoints as api, resolveFileUrl } from '@/lib/api';
 import { GRADIENTS, SKILL_ICONS, PROJECT_CATEGORIES } from '@/lib/options';
@@ -29,8 +30,9 @@ const refreshAll = (...urls: string[]) => () =>
   Promise.all([api.sections, ...urls].map((u) => revalidate(u))).catch(() => undefined);
 
 function Secondary({ children, lines = 2 }: { children: React.ReactNode; lines?: number }) {
+  const theme = useAppTheme();
   return (
-    <Text style={{ fontSize: 13, color: colors.textSecondary }} numberOfLines={lines}>
+    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }} numberOfLines={lines}>
       {children}
     </Text>
   );
@@ -71,12 +73,14 @@ export function HomeContentView() {
       <SingletonForm<Profile>
         url={api.profile}
         title="Hero"
+        icon="account-star-outline"
         subheader="The first screen visitors see."
         fields={HERO_FIELDS}
       />
       <CrudList<Stat>
         url={api.stats}
         title="Stats"
+        icon="chart-box-outline"
         subheader="Numbers under the hero (turn the whole row off in Configuration)."
         itemName="stat"
         fields={STAT_FIELDS}
@@ -112,6 +116,7 @@ export function AboutContentView() {
       <CrudList<AboutParagraph>
         url={api.aboutParagraphs}
         title="About paragraphs"
+        icon="text-box-outline"
         itemName="paragraph"
         fields={PARAGRAPH_FIELDS}
         renderPrimary={(p) => p.content}
@@ -119,6 +124,7 @@ export function AboutContentView() {
       <CrudList<Highlight>
         url={api.highlights}
         title="Highlights"
+        icon="star-four-points-outline"
         subheader="Small cards under the paragraphs."
         itemName="highlight"
         fields={HIGHLIGHT_FIELDS}
@@ -146,6 +152,7 @@ export function SkillsContentView() {
       <CrudList<SkillGroup>
         url={api.skillGroups}
         title="Skill groups"
+        icon="layers-triple-outline"
         itemName="skill group"
         fields={SKILL_GROUP_FIELDS}
         renderPrimary={(g) => g.title}
@@ -154,6 +161,7 @@ export function SkillsContentView() {
       <CrudList<MarqueeItem>
         url={api.marquee}
         title="Scrolling technology strip"
+        icon="marquee"
         subheader="The infinite marquee under the skill cards (turn it off in Configuration)."
         itemName="technology"
         fields={MARQUEE_FIELDS}
@@ -188,6 +196,7 @@ export function ExperienceContentView() {
       <CrudList<Experience>
         url={api.experiences}
         title="Work history"
+        icon="briefcase-outline"
         subheader="Newest first — use the arrows to reorder."
         itemName="experience"
         fields={EXPERIENCE_FIELDS}
@@ -263,6 +272,7 @@ export function ProjectsContentView() {
       <CrudList<Project>
         url={api.projects}
         title="Projects"
+        icon="folder-star-outline"
         itemName="project"
         fields={PROJECT_FIELDS}
         renderLeading={(p) => <ProjectCover project={p} />}
@@ -316,12 +326,14 @@ export function ContactContentView() {
       <SingletonForm<Profile>
         url={api.profile}
         title="Contact details"
+        icon="card-account-mail-outline"
         subheader="Empty fields are hidden on the website."
         fields={CONTACT_FIELDS}
       />
       <SingletonForm<Profile>
         url={api.profile}
         title="Social links & footer"
+        icon="share-variant-outline"
         subheader="Icons appear in the footer for every link you fill in."
         fields={SOCIAL_FIELDS}
       />
