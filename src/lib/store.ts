@@ -68,8 +68,12 @@ export function useResource<T>(url: string) {
   }, [url]);
 
   useEffect(() => {
-    if (!cache.has(url)) refresh();
-  }, [url, refresh]);
+    if (cache.has(url)) return;
+    revalidate(url).then(
+      () => setError(null),
+      (e) => setError(e as Error)
+    );
+  }, [url]);
 
   return { data, error, isLoading: data === undefined && !error, refreshing, refresh };
 }
