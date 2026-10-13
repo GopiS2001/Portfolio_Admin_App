@@ -2,9 +2,10 @@ import type { FieldDef } from './fields';
 import type { Section, SectionKey } from '@/lib/types';
 
 import { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
 
-import { colors } from '@/theme';
+import { FONT, useAppTheme } from '@/theme';
 import { http, endpoints } from '@/lib/api';
 import { revalidate, useResource } from '@/lib/store';
 
@@ -33,12 +34,14 @@ export async function saveSection(key: SectionKey, body: Partial<Section>) {
 
 /** On/off toggle, nav label and heading copy for one website section. */
 export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
+  const theme = useAppTheme();
   const { data } = useResource<Section[]>(endpoints.sections);
   const section = data?.find((s) => s.key === sectionKey);
   const fields = sectionKey === 'home' ? HOME_FIELDS : FIELDS;
   const form = useFieldForm(fields, section);
   const [saving, setSaving] = useState(false);
   const v = form.values;
+  const accent = theme.custom.tones.warning.fg;
 
   const save = async () => {
     setSaving(true);
@@ -56,9 +59,10 @@ export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
     <Card
       title="Section settings"
       subheader="Turn the whole section on or off and edit its heading."
+      icon="tune-variant"
       action={
         section && (
-          <Label tone={section.visible ? 'success' : 'default'}>
+          <Label tone={section.visible ? 'success' : 'default'} icon={section.visible ? 'circle' : undefined}>
             {section.visible ? 'Live' : 'Hidden'}
           </Label>
         )
@@ -67,18 +71,27 @@ export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
       <FormFields fields={fields} form={form} />
 
       {sectionKey !== 'home' && (
-        <View style={{ marginTop: 20, padding: 16, borderRadius: 12, backgroundColor: colors.neutral }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textDisabled, letterSpacing: 1 }}>
+        <View
+          style={{
+            marginTop: 18,
+            padding: 18,
+            borderRadius: 16,
+            backgroundColor: theme.custom.neutral,
+            borderLeftWidth: 3,
+            borderLeftColor: accent,
+          }}
+        >
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, letterSpacing: 1.5 }}>
             PREVIEW
           </Text>
           {!!v.eyebrow && (
-            <Text style={{ fontSize: 12, color: colors.warningDark, letterSpacing: 2, marginTop: 6 }}>
+            <Text variant="labelMedium" style={{ color: accent, letterSpacing: 2, marginTop: 8 }}>
               {String(v.eyebrow).toUpperCase()}
             </Text>
           )}
-          <Text style={{ fontSize: 26, fontFamily: 'serif', color: colors.text, marginTop: 4 }}>
+          <Text style={{ fontSize: 28, lineHeight: 34, fontFamily: 'serif', color: theme.colors.onSurface, marginTop: 4 }}>
             {v.title}{' '}
-            <Text style={{ fontStyle: 'italic', color: colors.warningDark }}>{v.highlight}</Text>
+            <Text style={{ fontFamily: 'serif', fontStyle: 'italic', color: accent }}>{v.highlight}</Text>
             {v.titleSuffix}
           </Text>
         </View>
@@ -88,3 +101,5 @@ export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
     </Card>
   );
 }
+
+export { FONT };
