@@ -71,6 +71,17 @@ export function resolveFileUrl(url?: string | null) {
   return url;
 }
 
+/**
+ * For showing an image: also turns a Google Drive share link (which opens a web page) into
+ * Drive's direct image address. The file must be shared with "Anyone with the link".
+ */
+const DRIVE_FILE = /^https:\/\/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{10,})/;
+export function resolveImageUrl(url?: string | null) {
+  const resolved = resolveFileUrl(url);
+  const match = resolved?.match(DRIVE_FILE);
+  return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800` : resolved;
+}
+
 // ----------------------------------------------------------------------
 
 export const endpoints = {
