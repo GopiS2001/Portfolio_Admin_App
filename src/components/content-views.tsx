@@ -259,9 +259,9 @@ function ProjectCover({ project }: { project: Project }) {
   const gradient = GRADIENTS.find((g) => g.value === project.gradient) ?? GRADIENTS[0];
   const image = resolveFileUrl(project.imageUrl);
   return image ? (
-    <Image source={{ uri: image }} style={{ width: 56, height: 40, borderRadius: 6 }} />
+    <Image source={{ uri: image }} style={{ width: 64, height: 48, borderRadius: 12 }} />
   ) : (
-    <GradientSwatch css={gradient.css} width={56} height={40} />
+    <GradientSwatch css={gradient.css} width={64} height={48} radius={12} />
   );
 }
 
