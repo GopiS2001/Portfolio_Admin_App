@@ -24,6 +24,7 @@ const PASSWORD_FIELDS: FieldDef[] = [
 ];
 
 export default function AccountScreen() {
+  const theme = useAppTheme();
   const { user, refreshUser } = useAuth();
   const source = useMemo(() => ({ displayName: user?.displayName, email: user?.email }), [user]);
   const account = useFieldForm(ACCOUNT_FIELDS, source);
