@@ -1,7 +1,10 @@
 import type { FieldDef } from '@/components/fields';
 
 import { useMemo, useState } from 'react';
+import { View } from 'react-native';
+import { Text, Avatar } from 'react-native-paper';
 
+import { useAppTheme } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { http, endpoints as api } from '@/lib/api';
 import { Card, toast, Button, Screen } from '@/components/ui';
