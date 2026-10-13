@@ -23,15 +23,27 @@ function detectServerUrl() {
 export const DEFAULT_SERVER_URL = detectServerUrl();
 
 let serverUrl = DEFAULT_SERVER_URL;
+
+// Access token (15 min) lives in memory only. The refresh token is in SecureStore (see auth.tsx).
 let token: string | null = null;
+let tokenExpiresAt = 0;
+let refresher: (() => Promise<boolean>) | null = null;
 let onUnauthorized: (() => void) | null = null;
+
+/** Refresh this long before the access token expires. */
+const REFRESH_MARGIN_MS = 60_000;
 
 export const getServerUrl = () => serverUrl;
 export const setServerUrl = (url: string) => {
   serverUrl = url.trim().replace(/\/$/, '') || DEFAULT_SERVER_URL;
 };
-export const setToken = (value: string | null) => {
+export const setToken = (value: string | null, expiresAt = 0) => {
   token = value;
+  tokenExpiresAt = expiresAt;
+};
+/** auth.tsx registers how to get a new access token; resolves false when the session is over. */
+export const setRefreshHandler = (handler: (() => Promise<boolean>) | null) => {
+  refresher = handler;
 };
 export const setUnauthorizedHandler = (handler: (() => void) | null) => {
   onUnauthorized = handler;
@@ -79,11 +91,32 @@ export const endpoints = {
   password: '/api/auth/password',
   me: '/api/auth/me',
   signIn: '/api/auth/sign-in',
+  refresh: '/api/auth/refresh',
+  signOut: '/api/auth/sign-out',
 } as const;
 
 // ----------------------------------------------------------------------
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+/** HTTP error with the status and the API's auth code (e.g. SESSION_REVOKED). */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string
+  ) {
+    super(message);
+  }
+}
+
+const isAuthCall = (path: string) =>
+  path === endpoints.signIn || path === endpoints.refresh || path === endpoints.signOut;
+
+async function request<T>(method: string, path: string, body?: unknown, retried = false): Promise<T> {
+  // Refresh shortly before the access token expires instead of waiting for a 401
+  if (token && refresher && !isAuthCall(path) && Date.now() > tokenExpiresAt - REFRESH_MARGIN_MS) {
+    await refresher().catch(() => false);
+  }
+
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   let res: Response;
   try {
@@ -92,7 +125,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       headers: {
         Accept: 'application/json',
         ...(isForm ? {} : body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(token && !isAuthCall(path) ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: isForm ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -109,10 +142,19 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   }
 
   if (!res.ok) {
-    if (res.status === 401 && token) onUnauthorized?.();
+    // Access token expired or refused: get a new one and retry once
+    if (res.status === 401 && !isAuthCall(path) && !retried && refresher) {
+      const ok = await refresher().catch(() => false);
+      if (ok) return request<T>(method, path, body, true);
+    }
+    if (res.status === 401 && !isAuthCall(path) && token) onUnauthorized?.();
     // Nest validation errors come back as an array of messages
     const raw = data?.message;
-    throw new Error((Array.isArray(raw) ? raw.join(', ') : raw) || `Request failed (${res.status})`);
+    throw new ApiError(
+      (Array.isArray(raw) ? raw.join(', ') : raw) || `Request failed (${res.status})`,
+      res.status,
+      data?.code
+    );
   }
   return data as T;
 }
