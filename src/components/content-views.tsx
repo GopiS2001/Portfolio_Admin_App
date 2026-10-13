@@ -283,8 +283,16 @@ export function ProjectsContentView() {
               <Label tone={p.category === 'office' ? 'info' : 'default'}>
                 {PROJECT_CATEGORIES.find((c) => c.value === p.category)?.label ?? 'My project'}
               </Label>
-              {p.featured && <Label tone="warning">Featured</Label>}
-              {!!p.apkUrl && <Label tone="success">APK</Label>}
+              {p.featured && (
+                <Label tone="warning" icon="star">
+                  Featured
+                </Label>
+              )}
+              {!!p.apkUrl && (
+                <Label tone="success" icon="android">
+                  APK
+                </Label>
+              )}
             </View>
             <Secondary>{p.description}</Secondary>
             {p.tags.length > 0 && <ChipList items={p.tags} />}
