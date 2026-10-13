@@ -4,16 +4,17 @@ import type { Summary } from '@/lib/types';
 import { Tabs } from 'expo-router';
 import { Icon } from 'react-native-paper';
 
+import { useAppTheme } from '@/theme';
 import { endpoints } from '@/lib/api';
 import { useResource } from '@/lib/store';
-import { FONT, useAppTheme } from '@/theme';
+import { FloatingTabBar } from '@/components/tab-bar';
 
 // ----------------------------------------------------------------------
 
 /** Filled icon on the active tab, outlined otherwise. */
 const tabIcon = (active: string, inactive: string) =>
   function TabIcon({ color, focused }: { color: ColorValue; focused: boolean }) {
-    return <Icon source={focused ? active : inactive} size={24} color={color as string} />;
+    return <Icon source={focused ? active : inactive} size={22} color={color as string} />;
   };
 
 export default function TabLayout() {
@@ -22,38 +23,24 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
-        tabBarLabelStyle: { fontFamily: FONT.semibold, fontSize: 11 },
-        tabBarStyle: { backgroundColor: theme.colors.surface, borderTopColor: theme.custom.divider },
-        headerTitleStyle: { fontFamily: FONT.bold, fontSize: 20, color: theme.colors.onSurface },
-        headerStyle: { backgroundColor: theme.colors.background },
-        headerShadowVisible: false,
+        // Each tab draws its own large header inside the scroll view
+        headerShown: false,
         sceneStyle: { backgroundColor: theme.colors.background },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{ title: 'Dashboard', tabBarIcon: tabIcon('view-dashboard', 'view-dashboard-outline') }}
-      />
-      <Tabs.Screen
-        name="content"
-        options={{ title: 'Content', tabBarIcon: tabIcon('layers', 'layers-outline') }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: tabIcon('home-variant', 'home-variant-outline') }} />
+      <Tabs.Screen name="content" options={{ title: 'Content', tabBarIcon: tabIcon('layers', 'layers-outline') }} />
       <Tabs.Screen
         name="messages"
         options={{
-          title: 'Messages',
+          title: 'Inbox',
           tabBarBadge: summary?.unread ? summary.unread : undefined,
-          tabBarBadgeStyle: { backgroundColor: theme.colors.error, fontFamily: FONT.semibold, fontSize: 10 },
           tabBarIcon: tabIcon('email', 'email-outline'),
         }}
       />
-      <Tabs.Screen
-        name="configuration"
-        options={{ title: 'Settings', headerTitle: 'Configuration', tabBarIcon: tabIcon('cog', 'cog-outline') }}
-      />
+      <Tabs.Screen name="configuration" options={{ title: 'Settings', tabBarIcon: tabIcon('cog', 'cog-outline') }} />
     </Tabs>
   );
 }
