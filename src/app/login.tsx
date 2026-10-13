@@ -63,16 +63,28 @@ export default function LoginScreen() {
               </View>
               <View>
                 <FieldLabel label="Password" />
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="••••••"
-                  secureTextEntry
-                  textContentType="password"
-                  autoComplete="password"
-                  onSubmitEditing={submit}
-                  returnKeyType="go"
-                />
+                <View style={{ justifyContent: 'center' }}>
+                  <Input
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="••••••"
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    textContentType="password"
+                    autoComplete="password"
+                    onSubmitEditing={submit}
+                    returnKeyType="go"
+                    style={{ paddingRight: 48 }}
+                  />
+                  <View style={styles.eye}>
+                    <IconButton
+                      icon={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      label={showPassword ? 'Hide password' : 'Show password'}
+                      onPress={() => setShowPassword((v) => !v)}
+                    />
+                  </View>
+                </View>
               </View>
 
               {showServer ? (
