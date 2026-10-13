@@ -41,9 +41,9 @@ const fonts = configureFonts({
     bodyLarge: f(FONT.regular, 16, 24),
     bodyMedium: f(FONT.regular, 14, 21),
     bodySmall: f(FONT.regular, 12, 17),
-    default: { fontFamily: FONT.regular, fontWeight: 'normal', letterSpacing: 0 },
   },
 });
+fonts.default = { fontFamily: FONT.regular, fontWeight: 'normal', letterSpacing: 0 };
 
 // ---------------------------------------------------------------------- semantic tones
 
