@@ -47,6 +47,10 @@ In this mode "Open website" / "Preview" links do not work (only the API is tunne
 
 ## Code layout
 
+UI is built with **React Native Paper** (Material 3). `src/theme.ts` holds the light and dark
+themes (brand colours, Plus Jakarta Sans font, status tones); the app follows the phone's
+light/dark setting.
+
 - `src/app/` — screens (Expo Router: `(tabs)/` is the bottom tab bar, `content/` the content pages)
 - `src/components/` — `CrudList`, `SingletonForm`, `SectionHeadingCard` and the form fields,
   mirroring `ADMIN DASHBOARD/src/portfolio/components`
