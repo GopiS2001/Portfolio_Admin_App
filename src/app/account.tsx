@@ -77,8 +77,3 @@ export default function AccountScreen() {
     </Screen>
   );
 }
-
-/** Same as FormFields, but with hidden text. */
-function PasswordFields({ form }: { form: ReturnType<typeof useFieldForm> }) {
-  return <FormFields fields={PASSWORD_FIELDS.map((f) => ({ ...f, secure: true }))} form={form} />;
-}
