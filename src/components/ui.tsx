@@ -60,7 +60,11 @@ export function Screen({
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
-      contentContainerStyle={styles.screen}
+      contentContainerStyle={[
+        styles.screen,
+        header ? { paddingTop: 0 } : null,
+        tab ? { paddingBottom: TAB_BAR_SPACE + insets.bottom } : null,
+      ]}
       keyboardShouldPersistTaps="handled"
       refreshControl={
         onRefresh ? (
