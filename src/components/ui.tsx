@@ -31,13 +31,20 @@ export function Screen({
   children,
   onRefresh,
   anchor,
+  header,
+  tab,
 }: {
   children: React.ReactNode;
   onRefresh?: () => Promise<unknown> | void;
   /** Anchor on the website to open with "Preview" (e.g. "projects"). */
   anchor?: string;
+  /** Large header rendered at the top of the scroll (tab screens). */
+  header?: React.ReactNode;
+  /** Tab screen: leaves room for the floating tab bar. */
+  tab?: boolean;
 }) {
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -414,6 +421,7 @@ export function ConfirmDialog({
   title,
   content,
   confirmLabel = 'Delete',
+  icon = 'trash-can-outline',
   onConfirm,
   onDismiss,
 }: {
@@ -421,6 +429,7 @@ export function ConfirmDialog({
   title: string;
   content?: string;
   confirmLabel?: string;
+  icon?: IconName;
   onConfirm: () => Promise<void> | void;
   onDismiss: () => void;
 }) {
@@ -439,7 +448,7 @@ export function ConfirmDialog({
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, borderRadius: 24 }}>
-        <Dialog.Icon icon="trash-can-outline" color={theme.colors.error} />
+        <Dialog.Icon icon={icon} color={theme.colors.error} />
         <Dialog.Title style={{ textAlign: 'center' }}>{title}</Dialog.Title>
         {content ? (
           <Dialog.Content>
