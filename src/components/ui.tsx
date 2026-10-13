@@ -14,7 +14,13 @@ import {
   IconButton as PaperIconButton,
 } from 'react-native-paper';
 
-import { useAppTheme } from '@/theme';
+import Svg, { Circle } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import type { TileKey } from '@/theme';
+
+import { FONT, TILES, useAppTheme } from '@/theme';
 import { websiteUrl } from '@/lib/api';
 
 // ----------------------------------------------------------------------
