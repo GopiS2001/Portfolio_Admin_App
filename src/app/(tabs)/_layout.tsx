@@ -13,8 +13,8 @@ import { FloatingTabBar } from '@/components/tab-bar';
 
 /** Filled icon on the active tab, outlined otherwise. */
 const tabIcon = (active: string, inactive: string) =>
-  function TabIcon({ color, focused }: { color: ColorValue; focused: boolean }) {
-    return <Icon source={focused ? active : inactive} size={22} color={color as string} />;
+  function TabIcon({ color, focused, size }: { color: ColorValue; focused: boolean; size: number }) {
+    return <Icon source={focused ? active : inactive} size={size} color={color as string} />;
   };
 
 export default function TabLayout() {
