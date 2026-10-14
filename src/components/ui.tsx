@@ -1,7 +1,7 @@
 import type { Tone, TileKey } from '@/theme';
 
 import { useState, useEffect, useCallback } from 'react';
-import { View, Linking, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Linking, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import {
   Text,
   Icon,
@@ -367,7 +367,7 @@ export function Button({
       {...colorProps}
       style={[{ borderRadius: 12 }, variant === 'outlined' && { borderColor: theme.colors.outline }, style]}
       contentStyle={size === 'small' ? { height: 36 } : { height: 46 }}
-      labelStyle={size === 'small' ? { fontSize: 13, marginVertical: 0 } : undefined}
+      labelStyle={size === 'small' ? { fontSize: theme.fonts.labelLarge.fontSize - 1, marginVertical: 0 } : undefined}
     >
       {label}
     </PaperButton>
