@@ -1,7 +1,6 @@
-import { Platform } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
 import { useRef, useMemo, useState, useEffect, useContext, useCallback, createContext } from 'react';
 
+import { storage } from './storage';
 import { clearCache } from './store';
 import {
   http,
