@@ -15,7 +15,7 @@ import { Text } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
 import { revalidate } from '@/lib/store';
-import { endpoints as api, resolveFileUrl } from '@/lib/api';
+import { endpoints as api, resolveImageUrl } from '@/lib/api';
 import { GRADIENTS, SKILL_ICONS, PROJECT_CATEGORIES } from '@/lib/options';
 
 import { CrudList } from './crud-list';
@@ -257,7 +257,7 @@ const PROJECT_FIELDS: FieldDef[] = [
 
 function ProjectCover({ project }: { project: Project }) {
   const gradient = GRADIENTS.find((g) => g.value === project.gradient) ?? GRADIENTS[0];
-  const image = resolveFileUrl(project.imageUrl);
+  const image = resolveImageUrl(project.imageUrl);
   return image ? (
     <Image source={{ uri: image }} style={{ width: 64, height: 48, borderRadius: 12 }} />
   ) : (

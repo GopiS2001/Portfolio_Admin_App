@@ -16,7 +16,7 @@ import {
 } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
-import { uploadFile, resolveFileUrl } from '@/lib/api';
+import { uploadFile, resolveFileUrl, resolveImageUrl } from '@/lib/api';
 
 import { toast, Button, IconButton } from './ui';
 
@@ -530,7 +530,7 @@ function UploadField({
     }
   };
 
-  const preview = resolveFileUrl(value);
+  const preview = isImage ? resolveImageUrl(value) : resolveFileUrl(value);
   const fileName = value ? value.split('/').pop() : 'Nothing uploaded';
 
   return (
