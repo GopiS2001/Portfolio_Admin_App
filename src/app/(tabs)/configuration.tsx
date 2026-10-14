@@ -233,7 +233,8 @@ export default function ConfigurationScreen() {
               <SegmentedButtons
                 value={themePreference}
                 onValueChange={(t) => setThemePreference(t as typeof themePreference)}
-                buttons={APP_THEMES.map((t) => ({ value: t.value, label: t.label, icon: t.icon }))}
+                // Labels only: with icons, three buttons don't fit "System" on a phone
+                buttons={APP_THEMES.map((t) => ({ value: t.value, label: t.label }))}
               />
             </View>
             <Divider />
