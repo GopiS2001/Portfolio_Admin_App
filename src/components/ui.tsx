@@ -7,6 +7,7 @@ import {
   Icon,
   Dialog,
   Portal,
+  Switch,
   Surface,
   Snackbar,
   ActivityIndicator,
