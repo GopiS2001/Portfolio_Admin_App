@@ -206,10 +206,39 @@ export default function ConfigurationScreen() {
         </TouchableRipple>
 
         <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
+          THIS APP
+        </Text>
+
+        {/* Saved on this phone only and applied immediately — no Save needed */}
+        <Group
+          icon="cellphone-cog"
+          tile="violet"
+          title="App preferences"
+          summary={`${APP_THEMES.find((t) => t.value === themePreference)?.label} theme · ${fontSize} px text`}
+          defaultOpen
+        >
+          <View style={{ gap: 22 }}>
+            <View>
+              <Text variant="titleSmall">Theme</Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 10 }}>
+                System default follows your phone&apos;s dark mode setting
+              </Text>
+              <SegmentedButtons
+                value={themePreference}
+                onValueChange={(t) => setThemePreference(t as typeof themePreference)}
+                buttons={APP_THEMES.map((t) => ({ value: t.value, label: t.label, icon: t.icon }))}
+              />
+            </View>
+            <Divider />
+            <FontSizeTracker value={fontSize} onChange={setFontSize} />
+          </View>
+        </Group>
+
+        <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
           WEBSITE
         </Text>
 
-        <Group icon="format-list-bulleted" tile="emerald" title="Sections & menu" summary={`${live} live · changes apply instantly`} defaultOpen>
+        <Group icon="format-list-bulleted" tile="emerald" title="Sections & menu" summary={`${live} live · changes apply instantly`}>
           <SectionsList />
         </Group>
 
