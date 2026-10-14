@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -14,7 +15,8 @@ import {
 
 import { ToastHost } from '@/components/ui';
 import { useAuth, AuthProvider } from '@/lib/auth';
-import { FONT, darkTheme, lightTheme, useAppTheme, navigationTheme } from '@/theme';
+import { usePreferences, PreferencesProvider } from '@/lib/preferences';
+import { FONT, darkTheme, lightTheme, useAppTheme, withFontScale, navigationTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +35,7 @@ function RootNavigator() {
   return (
     <Stack
       screenOptions={{
-        headerTitleStyle: { fontFamily: FONT.bold, fontSize: 18 },
+        headerTitleStyle: { fontFamily: FONT.bold, fontSize: theme.fonts.titleLarge.fontSize - 2 },
         headerShadowVisible: false,
         headerStyle: { backgroundColor: theme.colors.background },
         contentStyle: { backgroundColor: theme.colors.background },

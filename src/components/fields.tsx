@@ -159,7 +159,7 @@ export function Input(
       placeholderTextColor={theme.colors.onSurfaceVariant}
       {...rest}
       style={[
-        { backgroundColor: theme.colors.surface, fontSize: 15 },
+        { backgroundColor: theme.colors.surface, fontSize: theme.fonts.bodyMedium.fontSize + 1 },
         multiline && { minHeight: 110 },
         style,
       ]}
@@ -285,7 +285,10 @@ export function SwitchRow({
             </Text>
           )}
         </View>
-        <Switch value={value} onValueChange={onChange} disabled={disabled} />
+        {/* The row handles the tap; the switch ignores touches so a swipe can't flip it */}
+        <View pointerEvents="none">
+          <Switch value={value} disabled={disabled} />
+        </View>
       </View>
     </TouchableRipple>
   );

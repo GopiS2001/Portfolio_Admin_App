@@ -77,7 +77,12 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
                   numberOfLines={1}
                   style={[
                     styles.label,
-                    { color, fontFamily: focused ? FONT.bold : FONT.medium },
+                    {
+                      color,
+                      fontFamily: focused ? FONT.bold : FONT.medium,
+                      fontSize: theme.fonts.labelSmall.fontSize + 1,
+                      lineHeight: theme.fonts.labelSmall.lineHeight,
+                    },
                   ]}
                 >
                   {label}
@@ -120,6 +125,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  label: { fontSize: 12, lineHeight: 16 },
+  label: {},
   badge: { position: 'absolute', top: -5, right: -10 },
 });

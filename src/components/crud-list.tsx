@@ -4,7 +4,7 @@ import type { FieldDef } from './fields';
 import { useMemo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Modal, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
-import { Text, Portal, Switch, Appbar, Button as PaperButton } from 'react-native-paper';
+import { Text, Portal, Appbar } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
 import { createItem, deleteItem, updateItem, useResource, reorderItems } from '@/lib/store';
@@ -17,6 +17,7 @@ import {
   Divider,
   Loading,
   ToastHost,
+  TapSwitch,
   EmptyState,
   IconButton,
   ConfirmDialog,
@@ -127,7 +128,7 @@ export function CrudList<T extends Ordered>({
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
               {item.visible ? 'Visible' : 'Hidden'}
             </Text>
-            <Switch value={item.visible} onValueChange={() => toggleVisible(item)} accessibilityLabel="Visible on website" />
+            <TapSwitch value={item.visible} onValueChange={() => toggleVisible(item)} accessibilityLabel="Visible on website" />
             <IconButton icon="pencil-outline" label="Edit" onPress={() => setEditing(item)} />
             <IconButton icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(item)} />
           </View>
@@ -228,9 +229,6 @@ function ItemEditor<T extends Ordered>({
           >
             <Appbar.Action icon="close" onPress={onClose} accessibilityLabel="Cancel" />
             <Appbar.Content title={title.charAt(0).toUpperCase() + title.slice(1)} titleStyle={theme.fonts.titleLarge} />
-            <PaperButton mode="contained" onPress={save} loading={saving} disabled={saving} style={{ marginRight: 8, borderRadius: 12 }}>
-              Save
-            </PaperButton>
           </Appbar.Header>
 
           <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
