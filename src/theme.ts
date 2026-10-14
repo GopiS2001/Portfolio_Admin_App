@@ -215,6 +215,23 @@ export const darkTheme: AppTheme = {
 
 export const useAppTheme = () => useTheme<AppTheme>();
 
+/** The theme with every text style scaled (the app's text-size preference). */
+export function withFontScale(theme: AppTheme, scale: number): AppTheme {
+  if (scale === 1) return theme;
+  const fontsScaled = Object.fromEntries(
+    Object.entries(theme.fonts).map(([variant, style]) => {
+      const s = style as { fontSize?: number; lineHeight?: number };
+      return [
+        variant,
+        s.fontSize
+          ? { ...s, fontSize: Math.round(s.fontSize * scale * 10) / 10, lineHeight: s.lineHeight && Math.round(s.lineHeight * scale) }
+          : s,
+      ];
+    })
+  ) as AppTheme['fonts'];
+  return { ...theme, fonts: fontsScaled };
+}
+
 /** Headers, tab bar and screen backgrounds follow the Paper theme. */
 export function navigationTheme(theme: AppTheme, base: NavigationTheme): NavigationTheme {
   return {
