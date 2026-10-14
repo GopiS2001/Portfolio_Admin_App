@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, TextInput, TouchableRipple } from 'react-native-paper';
-import { View, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { View, Image, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
 
 import { useAppTheme } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { DEFAULT_SERVER_URL } from '@/lib/api';
 import { Input, Helper } from '@/components/fields';
-import { Icon, Card, Button, ErrorBanner } from '@/components/ui';
+import { Icon, Card, Button, ErrorBanner, WarningBanner } from '@/components/ui';
 
 // ----------------------------------------------------------------------
 
 export default function LoginScreen() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
-  const { signIn, serverUrl } = useAuth();
+  const { signIn, serverUrl, endReason } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -74,6 +74,15 @@ export default function LoginScreen() {
                   </Text>
                 </View>
 
+                {!error && endReason && (
+                  <WarningBanner
+                    message={
+                      endReason === 'revoked'
+                        ? 'You were signed out — this session was ended from another device or for your security.'
+                        : 'Your session expired. Please sign in again.'
+                    }
+                  />
+                )}
                 {!!error && <ErrorBanner message={error} />}
 
                 <Input
