@@ -110,6 +110,7 @@ export default function ConfigurationScreen() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
+  const { fontSize, setFontSize, themePreference, setThemePreference } = usePreferences();
   const { data: settings, refresh } = useResource<Settings>(api.settings);
   const { data: sections } = useResource<Section[]>(api.sections);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
