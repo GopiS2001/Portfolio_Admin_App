@@ -375,6 +375,39 @@ export function Button({
   );
 }
 
+/**
+ * On/off switch that changes only on a tap. Android's native switch also flips when a finger
+ * drags across it, so swiping or scrolling over a list could toggle several switches at once.
+ * Here the switch ignores touches itself and the surrounding Pressable handles taps only.
+ */
+export function TapSwitch({
+  value,
+  onValueChange,
+  disabled,
+  accessibilityLabel,
+  ...switchProps
+}: {
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  disabled?: boolean;
+  accessibilityLabel?: string;
+} & Omit<React.ComponentProps<typeof Switch>, 'value' | 'onValueChange' | 'disabled'>) {
+  return (
+    <Pressable
+      onPress={() => onValueChange(!value)}
+      disabled={disabled}
+      hitSlop={6}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value, disabled }}
+      accessibilityLabel={accessibilityLabel}
+    >
+      <View pointerEvents="none">
+        <Switch value={value} disabled={disabled} {...switchProps} />
+      </View>
+    </Pressable>
+  );
+}
+
 export function IconButton({
   icon,
   onPress,
