@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Platform, UIManager, StyleSheet, LayoutAnimation } from 'react-native';
 import {
   Text,
-  Switch,
   Surface,
   ProgressBar,
   TouchableRipple,
@@ -20,6 +19,8 @@ import {
 
 import { useAuth } from '@/lib/auth';
 import { useAppTheme } from '@/theme';
+import { usePreferences } from '@/lib/preferences';
+import { FontSizeTracker } from '@/components/font-size-tracker';
 import { http, endpoints as api } from '@/lib/api';
 import { saveSection } from '@/components/section-heading-card';
 import { SANS_FONTS, SERIF_FONTS, SECTION_LABELS } from '@/lib/options';
@@ -32,6 +33,7 @@ import {
   Screen,
   Divider,
   TabHeader,
+  TapSwitch,
   IconButton,
   GradientTile,
   ConfirmDialog,
@@ -173,7 +175,8 @@ export default function ConfigurationScreen() {
                   {online ? `${live} of ${sections?.length ?? 0} sections live` : 'Visitors see the maintenance message'}
                 </Text>
               </View>
-              <Switch
+              <TapSwitch
+                accessibilityLabel="Website online"
                 value={online}
                 onValueChange={(on) => form.set('siteEnabled', on)}
                 color="#FFFFFF"
@@ -493,13 +496,13 @@ function SectionsList() {
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
                 Site
               </Text>
-              <Switch value={s.visible} onValueChange={() => toggle(s, 'visible')} />
+              <TapSwitch value={s.visible} onValueChange={() => toggle(s, 'visible')} accessibilityLabel={`Show ${SECTION_LABELS[s.key]} on the website`} />
             </View>
             <View style={styles.switchLine}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
                 Menu
               </Text>
-              <Switch value={s.showInNav} disabled={!s.visible} onValueChange={() => toggle(s, 'showInNav')} />
+              <TapSwitch value={s.showInNav} disabled={!s.visible} onValueChange={() => toggle(s, 'showInNav')} accessibilityLabel={`Show ${SECTION_LABELS[s.key]} in the menu`} />
             </View>
           </View>
         </View>
