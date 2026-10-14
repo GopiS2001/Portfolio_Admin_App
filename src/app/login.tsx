@@ -53,9 +53,11 @@ export default function LoginScreen() {
             style={[styles.hero, { paddingTop: insets.top + 48 }]}
           >
             <View style={styles.glow} />
-            <View style={styles.logo}>
-              <Icon source="view-dashboard-variant" size={30} color="#FFFFFF" />
-            </View>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.logo}
+              accessibilityLabel="Portfolio Admin logo"
+            />
             <Text variant="headlineMedium" style={{ color: '#FFFFFF' }}>
               Portfolio Admin
             </Text>
