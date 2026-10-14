@@ -59,8 +59,19 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  return (
+    <PreferencesProvider>
+      <ThemedApp />
+    </PreferencesProvider>
+  );
+}
+
+/** Applies the app preferences: light/dark/system theme and text size. */
+function ThemedApp() {
   const scheme = useColorScheme();
-  const theme = scheme === 'dark' ? darkTheme : lightTheme;
+  const { ready, themePreference, fontScale } = usePreferences();
+  const dark = themePreference === 'system' ? scheme === 'dark' : themePreference === 'dark';
+  const theme = useMemo(() => withFontScale(dark ? darkTheme : lightTheme, fontScale), [dark, fontScale]);
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
@@ -69,7 +80,7 @@ export default function RootLayout() {
     PlusJakartaSans_800ExtraBold,
   });
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !ready) {
     return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
   }
 
