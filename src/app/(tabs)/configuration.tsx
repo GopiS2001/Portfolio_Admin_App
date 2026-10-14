@@ -95,6 +95,13 @@ const CUSTOM_FIELDS: FieldDef[] = [
 
 const ALL_FIELDS = [...SITE_FIELDS, ...HEADER_FIELDS, ...THEME_FIELDS, ...BLOCK_FIELDS, ...CUSTOM_FIELDS];
 
+/** This app's own look (saved on the phone) — separate from the website's default theme below. */
+const APP_THEMES = [
+  { value: 'light', label: 'Light', icon: 'white-balance-sunny' },
+  { value: 'dark', label: 'Dark', icon: 'weather-night' },
+  { value: 'system', label: 'System', icon: 'theme-light-dark' },
+] as const;
+
 const THEMES: { value: ThemeMode; label: string; icon: string }[] = [
   { value: 'light', label: 'Light', icon: 'white-balance-sunny' },
   { value: 'dark', label: 'Dark', icon: 'weather-night' },
