@@ -147,7 +147,12 @@ export function Input(
   props: Omit<React.ComponentProps<typeof TextInput>, 'mode' | 'error'> & { invalid?: boolean }
 ) {
   const theme = useAppTheme();
-  const { invalid, style, multiline, ...rest } = props;
+  const { invalid, style, multiline, keyboardType, ...rest } = props;
+  // React Native's Android TextInput clears the text input class for keyboardType="url"
+  // (it sets only TYPE_TEXT_VARIATION_URI), which leaves the field non-editable: no cursor,
+  // no typing, no deleting. Use the normal keyboard there, without auto-correct for links.
+  const isUrl = keyboardType === 'url';
+  const safeKeyboard = isUrl && Platform.OS === 'android' ? 'default' : keyboardType;
   return (
     <TextInput
       mode="outlined"
@@ -157,6 +162,8 @@ export function Input(
       outlineColor={theme.colors.outline}
       activeOutlineColor={theme.colors.primary}
       placeholderTextColor={theme.colors.onSurfaceVariant}
+      keyboardType={safeKeyboard}
+      {...(isUrl ? { autoCapitalize: 'none' as const, autoCorrect: false } : null)}
       {...rest}
       style={[
         { backgroundColor: theme.colors.surface, fontSize: theme.fonts.bodyMedium.fontSize + 1 },
