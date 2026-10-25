@@ -166,7 +166,7 @@ export default function MessagesScreen() {
             </View>
           </TouchableRipple>
         </View>
-      </Surface>
+      </View>
     );
   };
 
