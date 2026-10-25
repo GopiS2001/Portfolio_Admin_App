@@ -574,6 +574,6 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 8,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 22,
   },
 });
