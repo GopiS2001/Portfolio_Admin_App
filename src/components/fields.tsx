@@ -379,6 +379,7 @@ export function SelectField({
 // ---------------------------------------------------------------------- tags
 
 function TagsField({ field, value, onChange }: { field: FieldDef; value: string[]; onChange: (v: string[]) => void }) {
+  const theme = useAppTheme();
   const [draft, setDraft] = useState('');
 
   const add = (text: string) => {
