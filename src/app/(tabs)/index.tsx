@@ -130,6 +130,7 @@ export default function OverviewScreen() {
     >
       {/* Hero: website status ring + stats */}
       <View style={[styles.hero, neu(theme, 'raised', 9)]}>
+        <GlassBlur radius={30} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18 }}>
           <ProgressRing progress={total ? live / total : 0} size={108} stroke={9}>
             <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
