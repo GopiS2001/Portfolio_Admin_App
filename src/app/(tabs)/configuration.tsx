@@ -483,8 +483,8 @@ function SectionsList() {
   return (
     <View style={{ gap: 10 }}>
       {sections.map((s, i) => (
-        <View key={s.key} style={[styles.sectionRow, { backgroundColor: theme.custom.neutral, opacity: s.visible ? 1 : 0.7 }]}>
-          <View style={{ alignItems: 'center' }}>
+        <View key={s.key} style={[styles.sectionRow, neu(theme, s.visible ? 'raised' : 'inset', 4)]}>
+          <View style={{ alignItems: 'center', gap: 6 }}>
             <IconButton icon="chevron-up" label="Move up" size={18} disabled={i === 0} onPress={() => move(i, -1)} />
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginVertical: -4 }}>
               {i + 1}
