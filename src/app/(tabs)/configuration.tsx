@@ -11,7 +11,7 @@ import { Text, TouchableRipple } from 'react-native-paper';
 
 import { useAuth } from '@/lib/auth';
 import { neu, useAppTheme } from '@/theme';
-import { DESIGN_STYLES, usePreferences } from '@/lib/preferences';
+import { usePreferences } from '@/lib/preferences';
 import { FontSizeTracker } from '@/components/font-size-tracker';
 import { DesignStylePicker, DESIGN_STYLE_OPTIONS } from '@/components/style-picker';
 import { http, endpoints as api } from '@/lib/api';
