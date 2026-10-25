@@ -296,12 +296,10 @@ export function SwitchRow({
             </Text>
           )}
         </View>
-        {/* The row handles the tap; the switch ignores touches so a swipe can't flip it */}
-        <View pointerEvents="none">
-          <Switch value={value} disabled={disabled} />
-        </View>
+        {/* The row handles the tap; the switch is display-only so a swipe can't flip it */}
+        <NeuSwitch value={value} disabled={disabled} />
       </View>
-    </TouchableRipple>
+    </NeuPressable>
   );
 }
 
