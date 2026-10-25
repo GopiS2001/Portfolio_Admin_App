@@ -177,7 +177,7 @@ export const PALETTES: Record<DesignStyle, { light: Palette; dark: Palette }> = 
     },
     dark: {
       background: '#1B1640',
-      fill: 'rgba(255, 255, 255, 0.09)',
+      fill: 'rgba(255, 255, 255, 0.06)',
       well: 'rgba(0, 0, 0, 0.22)',
       solid: 'rgba(30, 26, 68, 0.94)',
       onSurface: '#F1F3FF',
