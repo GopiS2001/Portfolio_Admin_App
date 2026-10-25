@@ -1,5 +1,6 @@
 import type { MD3Theme } from 'react-native-paper';
 import type { Theme as NavigationTheme } from 'expo-router';
+import type { DesignStyle } from '@/lib/preferences';
 
 import { useTheme, MD3DarkTheme, configureFonts, MD3LightTheme } from 'react-native-paper';
 
@@ -102,23 +103,195 @@ export const TILES = {
 
 export type TileKey = keyof typeof TILES;
 
+// ---------------------------------------------------------------------- design styles
+
+/** Surface recipe for one design style in one mode — every raised / inset view is drawn from it. */
+export type Palette = {
+  /** Page colour (solid; glass also paints `backdrop` over it). */
+  background: string;
+  /** Raised surface fill. */
+  fill: string;
+  /** Pressed-in (inset) fill. */
+  well: string;
+  /** Opaque surface for things that float over content (tab bar, toast, save bar). */
+  solid: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  outline: string;
+  divider: string;
+  /** Highlight (light source, top-left / top edge). */
+  light: string;
+  /** Shade (bottom-right / drop shadow). */
+  dark: string;
+  /** Edge lines, for styles that draw them. */
+  border?: string;
+  wellBorder?: string;
+  /** Three-stop page gradient (glass needs something colourful behind it). */
+  backdrop?: readonly [string, string, string];
+};
+
+export const PALETTES: Record<DesignStyle, { light: Palette; dark: Palette }> = {
+  // Same colour everywhere; depth from paired highlight + shade
+  neumorphism: {
+    light: {
+      background: '#E4E9F0',
+      fill: '#E4E9F0',
+      well: '#E4E9F0',
+      solid: '#E4E9F0',
+      onSurface: '#253040',
+      onSurfaceVariant: '#64748B',
+      outline: '#BFC9D4',
+      divider: 'rgba(145, 158, 171, 0.28)',
+      light: 'rgba(255, 255, 255, 0.95)',
+      dark: 'rgba(148, 163, 186, 0.6)',
+    },
+    dark: {
+      background: '#232A32',
+      fill: '#232A32',
+      well: '#232A32',
+      solid: '#232A32',
+      onSurface: '#E6EBF0',
+      onSurfaceVariant: '#9AA8B5',
+      outline: '#3E4955',
+      divider: 'rgba(0, 0, 0, 0.35)',
+      light: 'rgba(255, 255, 255, 0.055)',
+      dark: 'rgba(0, 0, 0, 0.5)',
+    },
+  },
+  // Frosted translucent panes with a bright rim over a colourful gradient
+  glassmorphism: {
+    light: {
+      background: '#C9D6FF',
+      fill: 'rgba(255, 255, 255, 0.42)',
+      well: 'rgba(255, 255, 255, 0.2)',
+      solid: 'rgba(238, 243, 255, 0.94)',
+      onSurface: '#1E2433',
+      onSurfaceVariant: '#4A5468',
+      outline: 'rgba(255, 255, 255, 0.7)',
+      divider: 'rgba(255, 255, 255, 0.6)',
+      light: 'rgba(255, 255, 255, 0.75)',
+      dark: 'rgba(31, 38, 135, 0.16)',
+      border: 'rgba(255, 255, 255, 0.7)',
+      wellBorder: 'rgba(255, 255, 255, 0.45)',
+      backdrop: ['#A1C4FD', '#C2E9FB', '#FBC2EB'],
+    },
+    dark: {
+      background: '#1B1640',
+      fill: 'rgba(255, 255, 255, 0.09)',
+      well: 'rgba(0, 0, 0, 0.22)',
+      solid: 'rgba(30, 26, 68, 0.94)',
+      onSurface: '#F1F3FF',
+      onSurfaceVariant: '#B9BEDB',
+      outline: 'rgba(255, 255, 255, 0.25)',
+      divider: 'rgba(255, 255, 255, 0.12)',
+      light: 'rgba(255, 255, 255, 0.14)',
+      dark: 'rgba(0, 0, 0, 0.35)',
+      border: 'rgba(255, 255, 255, 0.18)',
+      wellBorder: 'rgba(255, 255, 255, 0.08)',
+      backdrop: ['#0B1026', '#3A1C71', '#0E5E6F'],
+    },
+  },
+  // Puffy pastel clay: soft drop shadow plus inner highlight and inner shade
+  claymorphism: {
+    light: {
+      background: '#EFE9F7',
+      fill: '#FAF7FE',
+      well: '#E6DEF2',
+      solid: '#FAF7FE',
+      onSurface: '#2E2640',
+      onSurfaceVariant: '#6E6585',
+      outline: '#D6CCE6',
+      divider: 'rgba(110, 101, 133, 0.18)',
+      light: 'rgba(255, 255, 255, 0.95)',
+      dark: 'rgba(120, 96, 170, 0.28)',
+    },
+    dark: {
+      background: '#211C2E',
+      fill: '#30293F',
+      well: '#1A1625',
+      solid: '#30293F',
+      onSurface: '#EEE8FA',
+      onSurfaceVariant: '#A79EBF',
+      outline: '#463D5C',
+      divider: 'rgba(0, 0, 0, 0.3)',
+      light: 'rgba(255, 255, 255, 0.1)',
+      dark: 'rgba(0, 0, 0, 0.55)',
+    },
+  },
+  // Tactile real-world objects: paper / leather tones, crisp edges, top sheen, drop shadows
+  skeuomorphism: {
+    light: {
+      background: '#D9D4CA',
+      fill: '#F4F1EA',
+      well: '#E4DFD4',
+      solid: '#F4F1EA',
+      onSurface: '#2B2620',
+      onSurfaceVariant: '#6B6255',
+      outline: '#B5AC9C',
+      divider: 'rgba(80, 66, 46, 0.25)',
+      light: 'rgba(255, 255, 255, 0.95)',
+      dark: 'rgba(40, 30, 15, 0.35)',
+      border: 'rgba(60, 48, 30, 0.3)',
+      wellBorder: 'rgba(60, 48, 30, 0.32)',
+    },
+    dark: {
+      background: '#1E1D1B',
+      fill: '#3A3834',
+      well: '#252421',
+      solid: '#3A3834',
+      onSurface: '#EDE8DF',
+      onSurfaceVariant: '#A8A196',
+      outline: '#57534B',
+      divider: 'rgba(0, 0, 0, 0.5)',
+      light: 'rgba(255, 255, 255, 0.12)',
+      dark: 'rgba(0, 0, 0, 0.7)',
+      border: 'rgba(0, 0, 0, 0.65)',
+      wellBorder: 'rgba(0, 0, 0, 0.6)',
+    },
+  },
+};
+
+/** Shadow recipe per style. `d` is the depth in px. */
+const SHADOWS: Record<DesignStyle, (p: Palette, kind: 'raised' | 'inset', d: number) => string> = {
+  neumorphism: (p, kind, d) => {
+    const pre = kind === 'inset' ? 'inset ' : '';
+    return `${pre}${d}px ${d}px ${d * 2}px ${p.dark}, ${pre}${-d}px ${-d}px ${d * 2}px ${p.light}`;
+  },
+  glassmorphism: (p, kind, d) =>
+    kind === 'raised'
+      ? `0px ${d}px ${d * 3}px ${p.dark}, inset 0px 1px 0px ${p.light}`
+      : `inset 0px ${Math.ceil(d / 2)}px ${d * 1.5}px ${p.dark}`,
+  claymorphism: (p, kind, d) => {
+    const i = Math.max(2, Math.round(d * 0.6));
+    return kind === 'raised'
+      ? `${d}px ${Math.round(d * 1.5)}px ${d * 3}px ${p.dark}, inset ${-i}px ${-i}px ${i * 2}px ${p.dark}, inset ${i}px ${i}px ${i * 2}px ${p.light}`
+      : `inset ${i}px ${i}px ${i * 2}px ${p.dark}, inset ${-i}px ${-i}px ${i * 2}px ${p.light}`;
+  },
+  skeuomorphism: (p, kind, d) => {
+    const y = Math.max(1, Math.round(d / 3));
+    return kind === 'raised'
+      ? `inset 0px 1px 0px ${p.light}, inset 0px -2px 0px rgba(0, 0, 0, 0.07), 0px ${y}px ${Math.round(d * 0.8)}px ${p.dark}, 0px 1px 1px rgba(0, 0, 0, 0.2)`
+      : `inset 0px ${y + 1}px ${d}px ${p.dark}, 0px 1px 0px ${p.light}`;
+  },
+};
+
 // ---------------------------------------------------------------------- themes
 
 export type AppTheme = MD3Theme & {
   custom: {
     tones: Record<Tone, ToneColors>;
-    /** Soft panel behind previews and empty states (the base colour). */
+    style: DesignStyle;
+    /** The active style's surface recipe. */
+    surface: Palette;
+    /** Soft panel behind previews and empty states. */
     neutral: string;
     divider: string;
-    /** Neumorphic shadow pair: highlight (top-left) and shade (bottom-right). */
+    /** Shadow pair: highlight and shade. */
     neu: { light: string; dark: string };
   };
 };
 
-const LIGHT_BASE = '#E4E9F0';
-const DARK_BASE = '#232A32';
-
-export const lightTheme: AppTheme = {
+const brandLight: MD3Theme = {
   ...MD3LightTheme,
   roundness: 4,
   fonts,
@@ -135,38 +308,15 @@ export const lightTheme: AppTheme = {
     tertiary: '#5B4FD6',
     tertiaryContainer: '#E7E3FF',
     onTertiaryContainer: '#22186E',
-    background: LIGHT_BASE,
-    onBackground: '#253040',
-    surface: LIGHT_BASE,
-    onSurface: '#253040',
-    surfaceVariant: '#DAE0E8',
-    onSurfaceVariant: '#64748B',
-    outline: '#BFC9D4',
-    outlineVariant: '#D3DAE3',
     error: '#D92D20',
     errorContainer: '#FFE4DE',
     onErrorContainer: '#7A0916',
     inverseSurface: '#253040',
-    inverseOnSurface: LIGHT_BASE,
     inversePrimary: '#5BE49B',
-    elevation: {
-      level0: 'transparent',
-      level1: LIGHT_BASE,
-      level2: LIGHT_BASE,
-      level3: LIGHT_BASE,
-      level4: LIGHT_BASE,
-      level5: LIGHT_BASE,
-    },
-  },
-  custom: {
-    tones: buildTones(false),
-    neutral: LIGHT_BASE,
-    divider: 'rgba(145, 158, 171, 0.28)',
-    neu: { light: 'rgba(255, 255, 255, 0.95)', dark: 'rgba(148, 163, 186, 0.6)' },
   },
 };
 
-export const darkTheme: AppTheme = {
+const brandDark: MD3Theme = {
   ...MD3DarkTheme,
   roundness: 4,
   fonts,
@@ -183,55 +333,77 @@ export const darkTheme: AppTheme = {
     tertiary: '#C4BDFF',
     tertiaryContainer: '#3B3196',
     onTertiaryContainer: '#E7E3FF',
-    background: DARK_BASE,
-    onBackground: '#E6EBF0',
-    surface: DARK_BASE,
-    onSurface: '#E6EBF0',
-    surfaceVariant: '#2A323B',
-    onSurfaceVariant: '#9AA8B5',
-    outline: '#3E4955',
-    outlineVariant: '#323B45',
     error: '#FF8A73',
     errorContainer: '#5C1A10',
     onErrorContainer: '#FFDAD2',
     inverseSurface: '#E6EBF0',
-    inverseOnSurface: DARK_BASE,
     inversePrimary: '#007867',
-    elevation: {
-      level0: 'transparent',
-      level1: DARK_BASE,
-      level2: DARK_BASE,
-      level3: DARK_BASE,
-      level4: DARK_BASE,
-      level5: DARK_BASE,
-    },
-  },
-  custom: {
-    tones: buildTones(true),
-    neutral: DARK_BASE,
-    divider: 'rgba(0, 0, 0, 0.35)',
-    neu: { light: 'rgba(255, 255, 255, 0.055)', dark: 'rgba(0, 0, 0, 0.5)' },
   },
 };
 
-export const useAppTheme = () => useTheme<AppTheme>();
-
-// ---------------------------------------------------------------------- neumorphism
-
-/**
- * Soft-UI depth for a view on the base colour: `raised` pushes it out of the page, `inset`
- * presses it in. `depth` is the shadow offset in px (blur is twice that). Spread it into a
- * style; set `backgroundColor` after it for a tinted surface.
- */
-export function neu(theme: AppTheme, kind: 'raised' | 'inset' = 'raised', depth = 6) {
-  const { light, dark } = theme.custom.neu;
-  const pre = kind === 'inset' ? 'inset ' : '';
-  const blur = depth * 2;
+/** Brand colours + the chosen design style's surfaces, in light or dark. */
+export function makeTheme(dark: boolean, style: DesignStyle): AppTheme {
+  const brand = dark ? brandDark : brandLight;
+  const p = PALETTES[style][dark ? 'dark' : 'light'];
   return {
-    backgroundColor: theme.colors.background,
-    boxShadow: `${pre}${depth}px ${depth}px ${blur}px ${dark}, ${pre}${-depth}px ${-depth}px ${blur}px ${light}`,
+    ...brand,
+    colors: {
+      ...brand.colors,
+      background: p.background,
+      onBackground: p.onSurface,
+      surface: p.solid,
+      onSurface: p.onSurface,
+      surfaceVariant: p.well,
+      onSurfaceVariant: p.onSurfaceVariant,
+      outline: p.outline,
+      outlineVariant: p.outline,
+      inverseOnSurface: p.background,
+      elevation: {
+        level0: 'transparent',
+        level1: p.solid,
+        level2: p.solid,
+        level3: p.solid,
+        level4: p.solid,
+        level5: p.solid,
+      },
+    },
+    custom: {
+      tones: buildTones(dark),
+      style,
+      surface: p,
+      neutral: p.well,
+      divider: p.divider,
+      neu: { light: p.light, dark: p.dark },
+    },
   };
 }
+
+export const lightTheme = makeTheme(false, 'neumorphism');
+export const darkTheme = makeTheme(true, 'neumorphism');
+
+export const useAppTheme = () => useTheme<AppTheme>();
+
+// ---------------------------------------------------------------------- surfaces
+
+/**
+ * Depth for a view in the active design style: `raised` lifts it off the page, `inset` presses
+ * it in. `depth` scales the shadows (px). Spread it into a style; set `backgroundColor` after it
+ * for a tinted surface. Glass and skeuomorphism also draw a 1px edge.
+ */
+export function neu(
+  theme: AppTheme,
+  kind: 'raised' | 'inset' = 'raised',
+  depth = 6
+): { backgroundColor: string; boxShadow: string; borderWidth?: number; borderColor?: string } {
+  const p = theme.custom.surface;
+  const edge = kind === 'raised' ? p.border : p.wellBorder;
+  return {
+    backgroundColor: kind === 'raised' ? p.fill : p.well,
+    boxShadow: SHADOWS[theme.custom.style](p, kind, depth),
+    ...(edge ? { borderWidth: 1, borderColor: edge } : null),
+  };
+}
+
 
 /** The theme with every text style scaled (the app's text-size preference). */
 export function withFontScale(theme: AppTheme, scale: number): AppTheme {
