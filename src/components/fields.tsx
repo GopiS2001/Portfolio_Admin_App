@@ -278,11 +278,14 @@ export function SwitchRow({
 }) {
   const theme = useAppTheme();
   return (
-    <TouchableRipple
+    <NeuPressable
+      depth={4}
       onPress={() => onChange(!value)}
       disabled={disabled}
-      borderless
-      style={[styles.switchRow, { backgroundColor: theme.custom.neutral }]}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value, disabled }}
+      accessibilityLabel={label}
+      style={styles.switchRow}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1 }}>
