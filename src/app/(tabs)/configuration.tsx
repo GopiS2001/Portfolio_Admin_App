@@ -481,7 +481,7 @@ function SectionsList() {
   };
 
   return (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: 14 }}>
       {sections.map((s, i) => (
         <View key={s.key} style={[styles.sectionRow, neu(theme, s.visible ? 'raised' : 'inset', 4)]}>
           <View style={{ alignItems: 'center', gap: 6 }}>
