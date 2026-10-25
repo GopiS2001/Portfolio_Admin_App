@@ -303,22 +303,16 @@ export default function ConfigurationScreen() {
       </Screen>
 
       {form.isDirty && (
-        <Surface
-          elevation={5}
-          style={[
-            styles.saveBar,
-            { backgroundColor: theme.colors.inverseSurface, bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 30 },
-          ]}
+        <View
+          style={[styles.saveBar, neu(theme, 'raised', 8), { bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 }]}
         >
-          <Icon source="pencil-circle" size={22} color={theme.colors.inversePrimary} />
-          <Text variant="labelLarge" style={{ flex: 1, color: theme.colors.inverseOnSurface }}>
+          <Icon source="pencil-circle" size={22} color={theme.colors.primary} />
+          <Text variant="labelLarge" style={{ flex: 1 }}>
             Unsaved changes
           </Text>
-          <PaperButton compact textColor={theme.colors.inverseOnSurface} onPress={form.reset} disabled={saving}>
-            Discard
-          </PaperButton>
+          <Button size="small" variant="text" tone="default" label="Discard" onPress={form.reset} disabled={saving} />
           <Button size="small" icon="check" label="Save" loading={saving} onPress={save} />
-        </Surface>
+        </View>
       )}
 
       <ConfirmDialog
