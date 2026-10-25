@@ -131,6 +131,8 @@ export default function ConfigurationScreen() {
       settings && {
         ...settings,
         defaultTheme: settings.defaultTheme ?? 'system',
+        designStyle: settings.designStyle ?? 'neumorphism',
+        enableStyleSwitcher: settings.enableStyleSwitcher ?? false,
         fontSans: settings.fontSans ?? 'Geist',
         fontSerif: settings.fontSerif ?? 'Instrument Serif',
         baseFontSize: settings.baseFontSize ?? 16,
