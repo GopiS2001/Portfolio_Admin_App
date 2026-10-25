@@ -24,7 +24,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 10) + 4 }]}>
       {/* Content scrolls underneath: frosted where the platform can blur it, opaque otherwise */}
       <View style={[styles.bar, neu(theme, 'raised', 8), { backgroundColor: floatingFill(theme) }]}>
-        <GlassBlur radius={34} intensity={90} />
+        <GlassBlur radius={999} intensity={90} />
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
