@@ -446,7 +446,7 @@ function LinksField({ field, value, onChange }: { field: FieldDef; value: LinkRo
         )}
       </View>
       {value.map((row, i) => (
-        <View key={i} style={[styles.linkRow, { backgroundColor: theme.custom.neutral }]}>
+        <View key={i} style={[styles.linkRow, neu(theme, 'raised', 4)]}>
           <View style={{ flex: 1, gap: 8 }}>
             <Input
               dense
