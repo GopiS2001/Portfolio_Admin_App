@@ -70,8 +70,8 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
               >
                 <View style={styles.nodeBox}>
                   {current ? (
-                    <View style={[styles.halo, { backgroundColor: theme.colors.primaryContainer }]}>
-                      <View style={[styles.currentNode, { backgroundColor: theme.colors.primary, borderColor: theme.colors.surface }]}>
+                    <View style={[styles.halo, neu(theme, 'raised', 4)]}>
+                      <View style={[styles.currentNode, neu(theme, 'inset', 2), { backgroundColor: theme.colors.primary }]}>
                         <Text style={{ color: theme.colors.onPrimary, fontFamily: FONT.bold, fontSize: 11 }}>Aa</Text>
                       </View>
                     </View>
