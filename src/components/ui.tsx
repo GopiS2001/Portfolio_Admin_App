@@ -136,7 +136,7 @@ export function Backdrop({ target }: { target?: React.RefObject<View | null> }) 
  * pass the pane's corner radius. iOS / web blur whatever is behind; Android blurs the screen's
  * backdrop, so outside a `GlassScene` it renders nothing there.
  */
-export function GlassBlur({ radius = 0, intensity = 30 }: { radius?: number; intensity?: number }) {
+export function GlassBlur({ radius = 0, intensity = 60 }: { radius?: number; intensity?: number }) {
   const theme = useAppTheme();
   const target = useContext(BlurTargetContext);
   if (theme.custom.style !== 'glassmorphism') return null;
@@ -772,7 +772,7 @@ export function ToastHost() {
         style={[styles.toast, neu(theme, 'raised', 7), { backgroundColor: floatingFill(theme) }]}
         accessibilityLiveRegion="polite"
       >
-        <GlassBlur radius={20} intensity={60} />
+        <GlassBlur radius={20} intensity={90} />
         <View style={[styles.tile, neu(theme, 'inset', 3), { width: 34, height: 34, borderRadius: 17 }]}>
           <Icon source={state.tone === 'error' ? 'alert-circle' : 'check-circle'} size={20} color={tone.main} />
         </View>
