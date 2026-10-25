@@ -1,7 +1,5 @@
-import type { Tone, TileKey } from '@/theme';
+import type { Tone, TileKey, AppTheme } from '@/theme';
 import type { StyleProp, ViewStyle, PressableProps } from 'react-native';
-
-import type { AppTheme } from '@/theme';
 
 import { useRef, useState, useEffect, useContext, useCallback, createContext } from 'react';
 import { View, Linking, Animated, Platform, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
