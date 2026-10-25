@@ -56,8 +56,7 @@ export function Screen({
   }, [onRefresh]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-    <Backdrop />
+    <GlassScene>
     <ScrollView
       style={{ flex: 1 }}
       contentContainerStyle={[
