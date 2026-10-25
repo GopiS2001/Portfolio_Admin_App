@@ -257,5 +257,5 @@ function ItemEditor<T extends Ordered>({
 const styles = StyleSheet.create({
   row: { padding: 16, gap: 12 },
   content: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
-  toolbar: { flexDirection: 'row', alignItems: 'center', gap: 2, borderRadius: 14, paddingHorizontal: 4, paddingVertical: 2 },
+  toolbar: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 22, paddingHorizontal: 7, paddingVertical: 7 },
 });
