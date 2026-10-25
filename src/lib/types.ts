@@ -1,5 +1,7 @@
 // Mirrors the NestJS entities in BACKEND/src/content/entities (same as the admin dashboard).
 
+import type { DesignStyle } from './preferences';
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type SectionKey = 'home' | 'about' | 'skills' | 'experience' | 'projects' | 'contact';
 
