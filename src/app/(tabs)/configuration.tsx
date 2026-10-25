@@ -368,19 +368,19 @@ function Group({
                 </Text>
               )}
             </View>
-            <View style={[styles.chevron, { backgroundColor: theme.custom.neutral, transform: [{ rotate: open ? '180deg' : '0deg' }] }]}>
-              <Icon source="chevron-down" size={20} color={theme.colors.onSurfaceVariant} />
+            <View style={[styles.chevron, neu(theme, open ? 'inset' : 'raised', 3), { transform: [{ rotate: open ? '180deg' : '0deg' }] }]}>
+              <Icon source="chevron-down" size={20} color={open ? theme.colors.primary : theme.colors.onSurfaceVariant} />
             </View>
           </View>
         </TouchableRipple>
         {open && (
           <>
             <Divider />
-            <View style={{ padding: 16 }}>{children}</View>
+            <View style={{ padding: 18 }}>{children}</View>
           </>
         )}
       </View>
-    </Surface>
+    </View>
   );
 }
 
