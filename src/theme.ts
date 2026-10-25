@@ -229,7 +229,7 @@ export function neu(theme: AppTheme, kind: 'raised' | 'inset' = 'raised', depth 
   const blur = depth * 2;
   return {
     backgroundColor: theme.colors.background,
-    boxShadow: ,
+    boxShadow: `${pre}${depth}px ${depth}px ${blur}px ${dark}, ${pre}${-depth}px ${-depth}px ${blur}px ${light}`,
   };
 }
 
