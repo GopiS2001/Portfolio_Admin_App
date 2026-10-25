@@ -53,8 +53,10 @@ export function Screen({
   }, [onRefresh]);
 
   return (
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Backdrop />
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={{ flex: 1 }}
       contentContainerStyle={[
         styles.screen,
         header ? { paddingTop: 0 } : null,
