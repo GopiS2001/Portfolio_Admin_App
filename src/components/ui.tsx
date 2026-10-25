@@ -1,11 +1,14 @@
 import type { Tone, TileKey } from '@/theme';
 import type { StyleProp, ViewStyle, PressableProps } from 'react-native';
 
-import { useState, useEffect, useCallback } from 'react';
-import { View, Linking, Animated, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import type { AppTheme } from '@/theme';
+
+import { useRef, useState, useEffect, useContext, useCallback, createContext } from 'react';
+import { View, Linking, Animated, Platform, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Text, Icon, Dialog, Portal, ActivityIndicator } from 'react-native-paper';
 
 import Svg, { Circle } from 'react-native-svg';
+import { BlurView, BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
