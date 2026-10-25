@@ -649,7 +649,7 @@ export function ToastHost() {
   const theme = useAppTheme();
   const [state, setState] = useState<ToastState>(null);
   const [visible, setVisible] = useState(false);
-  const fade = useRef(new Animated.Value(0)).current;
+  const [fade] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const show = (t: ToastState) => {
