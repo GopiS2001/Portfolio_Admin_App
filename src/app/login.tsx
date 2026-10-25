@@ -48,6 +48,7 @@ export default function LoginScreen() {
           <View style={[styles.hero, { paddingTop: insets.top + 40 }]}>
             {/* Logo sits in a pressed-in socket on a raised disc */}
             <View style={[styles.logoDisc, neu(theme, 'raised', 10)]}>
+              <GlassBlur radius={62} />
               <View style={[styles.logoSocket, neu(theme, 'inset', 5)]}>
                 <Image
                   source={require('../../assets/logo.png')}
