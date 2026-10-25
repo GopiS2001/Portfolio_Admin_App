@@ -355,11 +355,8 @@ function Group({
   };
 
   return (
-    <Surface
-      elevation={1}
-      style={[styles.group, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider, shadowColor: theme.custom.cardShadow }]}
-    >
-      <View style={{ borderRadius: 22, overflow: 'hidden' }}>
+    <View style={[styles.group, neu(theme, 'raised', open ? 7 : 6)]}>
+      <View style={{ borderRadius: 24, overflow: 'hidden' }}>
         <TouchableRipple onPress={toggle}>
           <View style={styles.groupHeader}>
             <GradientTile icon={icon} tile={tile} size={42} />
