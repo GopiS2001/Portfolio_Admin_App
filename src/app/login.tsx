@@ -119,7 +119,7 @@ export default function LoginScreen() {
               </View>
             </Card>
 
-            <View style={[styles.server, { backgroundColor: theme.custom.neutral }]}>
+            <View style={[styles.server, neu(theme, showServer ? 'raised' : 'inset', 4)]}>
               {showServer ? (
                 <View>
                   <Input
