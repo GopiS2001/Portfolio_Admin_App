@@ -33,8 +33,8 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
             Applies to the whole app
           </Text>
         </View>
-        <View style={[styles.valuePill, { backgroundColor: theme.colors.primaryContainer }]}>
-          <Text variant="labelLarge" style={{ color: theme.colors.onPrimaryContainer }}>
+        <View style={[styles.valuePill, neu(theme, 'inset', 3)]}>
+          <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
             {value} px{value === FONT_SIZE_DEFAULT ? ' · default' : ''}
           </Text>
         </View>
