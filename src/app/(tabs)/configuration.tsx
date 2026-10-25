@@ -208,12 +208,8 @@ export default function ConfigurationScreen() {
               <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 10 }}>
                 System default follows your phone&apos;s dark mode setting
               </Text>
-              <SegmentedButtons
-                value={themePreference}
-                onValueChange={(t) => setThemePreference(t as typeof themePreference)}
-                // Labels only: with icons, three buttons don't fit "System" on a phone
-                buttons={APP_THEMES.map((t) => ({ value: t.value, label: t.label }))}
-              />
+              {/* Labels only: with icons, three options don't fit "System" on a phone */}
+              <Segmented value={themePreference} onChange={setThemePreference} options={APP_THEMES} />
             </View>
             <Divider />
             <FontSizeTracker value={fontSize} onChange={setFontSize} />
