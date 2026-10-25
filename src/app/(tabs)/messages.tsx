@@ -257,16 +257,10 @@ export default function MessagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  search: { borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, height: 52 },
-  chip: { borderRadius: 14, borderWidth: StyleSheet.hairlineWidth },
+  search: { borderRadius: 20, overflow: 'hidden' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 38, borderRadius: 19 },
   group: { letterSpacing: 1, paddingHorizontal: 4, marginTop: 4 },
-  card: {
-    borderRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    shadowOpacity: 0.06,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-  },
+  card: { borderRadius: 22 },
   cardInner: { borderRadius: 22, overflow: 'hidden' },
   accent: { position: 'absolute', left: 0, top: 16, bottom: 16, width: 4, borderTopRightRadius: 4, borderBottomRightRadius: 4 },
   dot: { width: 8, height: 8, borderRadius: 4 },
