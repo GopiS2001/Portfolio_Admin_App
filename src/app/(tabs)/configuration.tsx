@@ -304,7 +304,11 @@ export default function ConfigurationScreen() {
 
       {form.isDirty && (
         <View
-          style={[styles.saveBar, neu(theme, 'raised', 8), { bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 }]}
+          style={[
+            styles.saveBar,
+            neu(theme, 'raised', 8),
+            { backgroundColor: theme.custom.surface.solid, bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 },
+          ]}
         >
           <Icon source="pencil-circle" size={22} color={theme.colors.primary} />
           <Text variant="labelLarge" style={{ flex: 1 }}>
