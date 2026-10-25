@@ -8,6 +8,7 @@ import { neu, FONT, useAppTheme } from '@/theme';
 import { http, endpoints as api } from '@/lib/api';
 import { revalidate, deleteItem, updateItem, useResource } from '@/lib/store';
 import {
+  Icon,
   toast,
   Button,
   Screen,
