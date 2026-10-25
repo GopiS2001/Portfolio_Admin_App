@@ -24,7 +24,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 10) + 4 }]}>
       {/* Content scrolls underneath: frosted where the platform can blur it, opaque otherwise */}
       <View style={[styles.bar, neu(theme, 'raised', 8), { backgroundColor: floatingFill(theme) }]}>
-        <GlassBlur radius={34} intensity={60} />
+        <GlassBlur radius={34} intensity={90} />
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
@@ -45,10 +45,19 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
               accessibilityRole="tab"
               accessibilityState={{ selected: focused }}
               accessibilityLabel={label}
+              // Rounded so the tap target (and web focus ring) is an oval, not a square
               style={styles.item}
             >
               {({ pressed }) => (
-                <View style={[styles.capsule, (focused || pressed) && neu(theme, 'inset', focused ? 4 : 2)]}>
+                <View
+                  style={[
+                    styles.capsule,
+                    (focused || pressed) && neu(theme, 'inset', focused ? 4 : 2),
+                    // Same edge width in every state (glass / skeuo draw one), so the oval never jumps
+                    { borderWidth: 1 },
+                    !(focused || pressed) && { borderColor: 'transparent' },
+                  ]}
+                >
                   <View>
                     {options.tabBarIcon?.({ focused, color, size: 24 })}
                     {badge !== undefined && (
