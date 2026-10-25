@@ -224,8 +224,7 @@ function ItemEditor<T extends Ordered>({
         <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
           <Appbar.Header
             statusBarHeight={Platform.OS === 'ios' ? 0 : insets.top}
-            style={{ backgroundColor: theme.colors.surface }}
-            elevated
+            style={{ backgroundColor: theme.colors.background }}
           >
             <Appbar.Action icon="close" onPress={onClose} accessibilityLabel="Cancel" />
             <Appbar.Content title={title.charAt(0).toUpperCase() + title.slice(1)} titleStyle={theme.fonts.titleLarge} />
