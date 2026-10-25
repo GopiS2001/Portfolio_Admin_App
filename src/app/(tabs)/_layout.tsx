@@ -1,12 +1,14 @@
 import type { ColorValue } from 'react-native';
-import type { Summary } from '@/lib/types';
+import type { Summary, Settings } from '@/lib/types';
 
+import { useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import { Icon } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
 import { endpoints } from '@/lib/api';
 import { useResource } from '@/lib/store';
+import { DESIGN_STYLES, usePreferences } from '@/lib/preferences';
 import { FloatingTabBar } from '@/components/tab-bar';
 
 // ----------------------------------------------------------------------
