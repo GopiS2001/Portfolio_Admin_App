@@ -157,43 +157,27 @@ export default function ConfigurationScreen() {
         header={<TabHeader overline="Website" title="Settings" subtitle="Control what visitors see and how it looks." />}
       >
         {/* Status hero — the switch is part of the form, saved with the bar below */}
-        <View style={[styles.heroShadow, { shadowColor: online ? theme.custom.gradient[1] : '#B71D18' }]}>
-          <LinearGradient
-            colors={online ? theme.custom.gradient : ['#4A0D0D', '#9A2A12', '#E2572B']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <View style={styles.glow} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-              <View style={styles.heroIcon}>
-                <Icon source={online ? 'web-check' : 'web-off'} size={26} color="#FFFFFF" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text variant="titleLarge" style={{ color: '#FFFFFF' }}>
-                  {online ? 'Website online' : 'Maintenance mode'}
-                </Text>
-                <Text variant="bodySmall" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                  {online ? `${live} of ${sections?.length ?? 0} sections live` : 'Visitors see the maintenance message'}
-                </Text>
-              </View>
-              <TapSwitch
-                accessibilityLabel="Website online"
-                value={online}
-                onValueChange={(on) => form.set('siteEnabled', on)}
-                color="#FFFFFF"
-                trackColor={{ true: 'rgba(255,255,255,0.45)', false: 'rgba(255,255,255,0.25)' }}
+        <View style={[styles.hero, neu(theme, 'raised', 8)]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <View style={[styles.heroIcon, neu(theme, 'inset', 4)]}>
+              <Icon
+                source={online ? 'web-check' : 'web-off'}
+                size={26}
+                color={theme.custom.tones[online ? 'success' : 'error'].main}
               />
             </View>
-          </LinearGradient>
+            <View style={{ flex: 1 }}>
+              <Text variant="titleLarge">{online ? 'Website online' : 'Maintenance mode'}</Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                {online ? `${live} of ${sections?.length ?? 0} sections live` : 'Visitors see the maintenance message'}
+              </Text>
+            </View>
+            <TapSwitch accessibilityLabel="Website online" value={online} onValueChange={(on) => form.set('siteEnabled', on)} />
+          </View>
         </View>
 
         {/* Account */}
-        <TouchableRipple
-          onPress={() => router.push('/account')}
-          borderless
-          style={[styles.account, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider }]}
-        >
+        <NeuPressable onPress={() => router.push('/account')} style={styles.account}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
             <GradientAvatar name={user?.displayName} size={48} />
             <View style={{ flex: 1 }}>
