@@ -7,7 +7,7 @@ import { neu, useAppTheme } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { DEFAULT_SERVER_URL } from '@/lib/api';
 import { Input, Helper } from '@/components/fields';
-import { Icon, Card, Button, ErrorBanner, WarningBanner } from '@/components/ui';
+import { Icon, Card, Button, Backdrop, ErrorBanner, WarningBanner } from '@/components/ui';
 
 // ----------------------------------------------------------------------
 
