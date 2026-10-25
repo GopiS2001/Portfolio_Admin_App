@@ -187,32 +187,37 @@ export default function MessagesScreen() {
         />
       }
     >
-      <Searchbar
-        placeholder="Search name, email or message"
-        value={query}
-        onChangeText={setQuery}
-        style={[styles.search, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider }]}
-        inputStyle={{ fontFamily: theme.fonts.bodyMedium.fontFamily, minHeight: 0 }}
-        elevation={0}
-      />
+      <View style={[styles.search, neu(theme, 'inset', 5)]}>
+        <Searchbar
+          placeholder="Search name, email or message"
+          value={query}
+          onChangeText={setQuery}
+          style={{ backgroundColor: 'transparent', height: 52 }}
+          inputStyle={{ fontFamily: theme.fonts.bodyMedium.fontFamily, minHeight: 0 }}
+          elevation={0}
+        />
+      </View>
 
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: -4 }}>
-        {(['all', 'unread'] as const).map((f) => (
-          <Chip
-            key={f}
-            selected={filter === f}
-            showSelectedCheck={false}
-            onPress={() => setFilter(f)}
-            icon={f === 'all' ? 'inbox' : 'email-alert'}
-            style={[
-              styles.chip,
-              { backgroundColor: filter === f ? theme.colors.primaryContainer : theme.colors.surface, borderColor: theme.custom.divider },
-            ]}
-            textStyle={{ color: filter === f ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant }}
-          >
-            {f === 'all' ? `All ${messages.length}` : `Unread ${unread}`}
-          </Chip>
-        ))}
+      {/* Filter pills: the active one is pressed in */}
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        {(['all', 'unread'] as const).map((f) => {
+          const active = filter === f;
+          const color = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
+          return (
+            <Pressable
+              key={f}
+              onPress={() => setFilter(f)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
+              style={({ pressed }) => [styles.chip, neu(theme, active || pressed ? 'inset' : 'raised', active ? 3 : 4)]}
+            >
+              <Icon source={f === 'all' ? 'inbox' : 'email-alert'} size={16} color={color} />
+              <Text style={{ color, fontFamily: active ? FONT.bold : FONT.medium, fontSize: theme.fonts.labelLarge.fontSize }}>
+                {f === 'all' ? `All ${messages.length}` : `Unread ${unread}`}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {isLoading ? (
