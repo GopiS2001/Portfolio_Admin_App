@@ -249,6 +249,39 @@ export const PALETTES: Record<DesignStyle, { light: Palette; dark: Palette }> = 
       wellBorder: 'rgba(0, 0, 0, 0.6)',
     },
   },
+  // Sage haze lit by a warm lamp glow: hairline-rimmed translucent panes, soft long shadows
+  zephyr: {
+    light: {
+      background: '#D6DBD0',
+      fill: 'rgba(255, 255, 255, 0.28)',
+      well: 'rgba(28, 33, 28, 0.06)',
+      solid: 'rgba(226, 230, 220, 0.96)',
+      onSurface: '#1C211C',
+      onSurfaceVariant: '#566052',
+      outline: 'rgba(28, 33, 28, 0.18)',
+      divider: 'rgba(28, 33, 28, 0.12)',
+      light: 'rgba(255, 255, 255, 0.5)',
+      dark: 'rgba(38, 48, 36, 0.3)',
+      border: 'rgba(255, 255, 255, 0.55)',
+      wellBorder: 'rgba(28, 33, 28, 0.1)',
+      backdrop: ['#C3CBBE', '#DDE1D7', '#EAD9B8'],
+    },
+    dark: {
+      background: '#151916',
+      fill: 'rgba(255, 255, 255, 0.045)',
+      well: 'rgba(0, 0, 0, 0.22)',
+      solid: 'rgba(27, 32, 28, 0.96)',
+      onSurface: '#ECEEE7',
+      onSurfaceVariant: '#A2AB9E',
+      outline: 'rgba(255, 255, 255, 0.16)',
+      divider: 'rgba(255, 255, 255, 0.09)',
+      light: 'rgba(255, 255, 255, 0.07)',
+      dark: 'rgba(0, 0, 0, 0.6)',
+      border: 'rgba(255, 255, 255, 0.12)',
+      wellBorder: 'rgba(255, 255, 255, 0.06)',
+      backdrop: ['#1E241F', '#141815', '#2A2418'],
+    },
+  },
 };
 
 /** Shadow recipe per style. `d` is the depth in px. */
