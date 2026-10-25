@@ -1,25 +1,14 @@
 import type { Tone, TileKey } from '@/theme';
+import type { StyleProp, ViewStyle, PressableProps } from 'react-native';
 
-import { useState, useEffect, useCallback } from 'react';
-import { View, Linking, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import {
-  Text,
-  Icon,
-  Dialog,
-  Portal,
-  Switch,
-  Surface,
-  Snackbar,
-  ActivityIndicator,
-  Button as PaperButton,
-  IconButton as PaperIconButton,
-} from 'react-native-paper';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { View, Linking, Animated, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { Text, Icon, Dialog, Portal, ActivityIndicator } from 'react-native-paper';
 
 import Svg, { Circle } from 'react-native-svg';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { FONT, TILES, useAppTheme } from '@/theme';
+import { neu, FONT, TILES, useAppTheme } from '@/theme';
 import { websiteUrl } from '@/lib/api';
 
 // ----------------------------------------------------------------------
@@ -85,15 +74,14 @@ export function Screen({
     >
       {header}
       {anchor !== undefined && (
-        <PaperButton
-          mode="text"
+        <Button
+          variant="soft"
+          size="small"
           icon="eye-outline"
-          compact
+          label="Preview on website"
           onPress={() => Linking.openURL(websiteUrl(anchor || undefined))}
-          style={{ alignSelf: 'flex-end', marginBottom: -8 }}
-        >
-          Preview on website
-        </PaperButton>
+          style={{ alignSelf: 'flex-end' }}
+        />
       )}
       {children}
     </ScrollView>
@@ -141,9 +129,52 @@ export function TabHeader({
   );
 }
 
-// ---------------------------------------------------------------------- Gradient tile / avatar / ring
+// ---------------------------------------------------------------------- Neumorphic building blocks
 
-/** Icon on a gradient square — the premium version of IconTile. */
+/** A view raised out of (or pressed into) the page. */
+export function NeuView({
+  kind = 'raised',
+  depth = 6,
+  style,
+  children,
+}: {
+  kind?: 'raised' | 'inset';
+  depth?: number;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+}) {
+  const theme = useAppTheme();
+  return <View style={[neu(theme, kind, depth), style]}>{children}</View>;
+}
+
+/** Raised surface that sinks in while pressed — the soft-UI touch feedback. */
+export function NeuPressable({
+  depth = 6,
+  style,
+  children,
+  ...rest
+}: Omit<PressableProps, 'style' | 'children'> & {
+  depth?: number;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+}) {
+  const theme = useAppTheme();
+  return (
+    <Pressable
+      {...rest}
+      style={({ pressed }) => [
+        neu(theme, pressed ? 'inset' : 'raised', pressed ? Math.max(2, Math.round(depth * 0.6)) : depth),
+        style,
+      ]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+// ---------------------------------------------------------------------- Tile / avatar / ring
+
+/** Icon on a raised soft tile, tinted with the tile's colour. */
 export function GradientTile({
   icon,
   tile = 'emerald',
@@ -155,15 +186,11 @@ export function GradientTile({
   size?: number;
   iconSize?: number;
 }) {
+  const theme = useAppTheme();
   return (
-    <LinearGradient
-      colors={TILES[tile]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[styles.tile, { width: size, height: size, borderRadius: size * 0.32 }]}
-    >
-      <Icon source={icon} size={iconSize ?? size * 0.5} color="#FFFFFF" />
-    </LinearGradient>
+    <View style={[styles.tile, neu(theme, 'raised', Math.max(3, Math.round(size / 11))), { width: size, height: size, borderRadius: size * 0.32 }]}>
+      <Icon source={icon} size={iconSize ?? size * 0.5} color={TILES[tile][1]} />
+    </View>
   );
 }
 
@@ -177,50 +204,46 @@ export const initials = (name?: string) =>
     .map((p) => p[0]!.toUpperCase())
     .join('') || '?';
 
-/** Initials on a gradient circle; the colour is stable per name. */
+/** Initials on a raised soft circle; the colour is stable per name. */
 export function GradientAvatar({ name, size = 44, muted }: { name?: string; size?: number; muted?: boolean }) {
+  const theme = useAppTheme();
   const hash = [...(name ?? '')].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
   const tile = muted ? 'slate' : AVATAR_TILES[hash % AVATAR_TILES.length];
   return (
-    <LinearGradient
-      colors={TILES[tile]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[styles.tile, { width: size, height: size, borderRadius: size / 2 }]}
-    >
-      <Text style={{ color: '#FFFFFF', fontFamily: FONT.bold, fontSize: size * 0.36 }}>{initials(name)}</Text>
-    </LinearGradient>
+    <View style={[styles.tile, neu(theme, 'raised', Math.max(3, Math.round(size / 11))), { width: size, height: size, borderRadius: size / 2 }]}>
+      <Text style={{ color: TILES[tile][1], fontFamily: FONT.extrabold, fontSize: size * 0.36 }}>{initials(name)}</Text>
+    </View>
   );
 }
 
-/** Circular progress ring with content in the middle. */
+/** Circular progress ring on a raised disc, content in a pressed-in centre. */
 export function ProgressRing({
   progress,
   size = 96,
   stroke = 9,
-  color = '#FFFFFF',
-  track = 'rgba(255,255,255,0.18)',
+  color,
   children,
 }: {
   progress: number;
   size?: number;
   stroke?: number;
   color?: string;
-  track?: string;
   children?: React.ReactNode;
 }) {
-  const r = (size - stroke) / 2;
+  const theme = useAppTheme();
+  const r = (size - stroke) / 2 - 4;
   const c = 2 * Math.PI * r;
   const p = Math.max(0, Math.min(1, progress));
+  const inner = size - (stroke + 8) * 2;
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={[styles.tile, neu(theme, 'raised', 7), { width: size, height: size, borderRadius: size / 2 }]}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={track} strokeWidth={stroke} fill="none" />
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={theme.custom.neu.dark} strokeOpacity={0.35} strokeWidth={stroke} fill="none" />
         <Circle
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke={color}
+          stroke={color ?? theme.colors.primary}
           strokeWidth={stroke}
           fill="none"
           strokeLinecap="round"
@@ -229,14 +252,16 @@ export function ProgressRing({
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      {children}
+      <View style={[styles.tile, neu(theme, 'inset', 4), { width: inner, height: inner, borderRadius: inner / 2 }]}>
+        {children}
+      </View>
     </View>
   );
 }
 
 // ---------------------------------------------------------------------- Card
 
-/** Elevated card with an optional header (icon tile, title, subtitle, action). */
+/** Raised soft card with an optional header (icon tile, title, subtitle, action). */
 export function Card({
   title,
   subheader,
@@ -256,17 +281,7 @@ export function Card({
   const hasHeader = !!(title || action);
 
   return (
-    <Surface
-      elevation={1}
-      style={[
-        styles.card,
-        {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.custom.divider,
-          shadowColor: theme.custom.cardShadow,
-        },
-      ]}
-    >
+    <View style={[styles.card, neu(theme, 'raised', 7)]}>
       <View style={styles.cardInner}>
         {hasHeader && (
           <View style={styles.cardHeader}>
@@ -285,31 +300,30 @@ export function Card({
         {hasHeader && children ? <Divider /> : null}
         {children ? <View style={padded ? styles.cardBody : undefined}>{children}</View> : null}
       </View>
-    </Surface>
+    </View>
   );
 }
 
+/** Tone-coloured icon in a pressed-in well. */
 export function IconTile({ icon, tone = 'primary', size = 40 }: { icon: IconName; tone?: Tone; size?: number }) {
   const theme = useAppTheme();
   const t = theme.custom.tones[tone];
   return (
-    <View style={[styles.tile, { width: size, height: size, borderRadius: size * 0.3, backgroundColor: t.bg }]}>
+    <View style={[styles.tile, neu(theme, 'inset', 3), { width: size, height: size, borderRadius: size * 0.3 }]}>
       <Icon source={icon} size={size * 0.52} color={t.fg} />
     </View>
   );
 }
 
+/** Engraved groove: a shade line over a highlight line. */
 export function Divider({ dashed, inset = 0 }: { dashed?: boolean; inset?: number }) {
   const theme = useAppTheme();
+  const borderStyle = dashed ? 'dashed' : 'solid';
   return (
-    <View
-      style={{
-        marginLeft: inset,
-        borderBottomWidth: StyleSheet.hairlineWidth * 2,
-        borderColor: theme.custom.divider,
-        borderStyle: dashed ? 'dashed' : 'solid',
-      }}
-    />
+    <View style={{ marginLeft: inset }}>
+      <View style={{ borderBottomWidth: 1, borderColor: theme.custom.divider, borderStyle }} />
+      <View style={{ borderBottomWidth: 1, borderColor: theme.custom.neu.light, borderStyle }} />
+    </View>
   );
 }
 
@@ -319,15 +333,16 @@ type ButtonProps = {
   label: string;
   icon?: IconName;
   onPress?: () => void;
+  /** contained: tinted raised pill · soft/outlined: base-colour raised pill · text: flat. */
   variant?: 'contained' | 'outlined' | 'soft' | 'text';
   tone?: 'primary' | 'error' | 'default';
   size?: 'small' | 'medium';
   disabled?: boolean;
   loading?: boolean;
-  style?: object;
+  style?: StyleProp<ViewStyle>;
 };
 
-/** Paper button with the dashboard's variants mapped to Material 3 modes. */
+/** Soft-UI button: raised at rest, pressed in while touched. */
 export function Button({
   label,
   icon,
@@ -340,58 +355,126 @@ export function Button({
   style,
 }: ButtonProps) {
   const theme = useAppTheme();
-  const mode = { contained: 'contained', outlined: 'outlined', soft: 'contained-tonal', text: 'text' }[variant] as
-    | 'contained'
-    | 'outlined'
-    | 'contained-tonal'
-    | 'text';
-
-  const colorProps =
-    tone === 'error'
-      ? variant === 'contained'
-        ? { buttonColor: theme.colors.error, textColor: theme.colors.onPrimary }
-        : variant === 'soft'
-          ? { buttonColor: theme.colors.errorContainer, textColor: theme.colors.onErrorContainer }
-          : { textColor: theme.colors.error }
-      : tone === 'default' && variant !== 'contained'
-        ? { textColor: theme.colors.onSurface }
-        : {};
+  const filled = variant === 'contained';
+  const accent =
+    tone === 'error' ? theme.colors.error : tone === 'default' ? theme.colors.onSurface : theme.colors.primary;
+  const fill = tone === 'error' ? theme.custom.tones.error.main : theme.colors.primary;
+  const fg = filled ? (tone === 'error' ? '#FFFFFF' : theme.colors.onPrimary) : accent;
+  const small = size === 'small';
+  const off = disabled || loading;
 
   return (
-    <PaperButton
-      mode={mode}
-      icon={icon}
+    <Pressable
       onPress={onPress}
-      disabled={disabled || loading}
-      loading={loading}
-      compact={size === 'small'}
-      {...colorProps}
-      style={[{ borderRadius: 12 }, variant === 'outlined' && { borderColor: theme.colors.outline }, style]}
-      contentStyle={size === 'small' ? { height: 36 } : { height: 46 }}
-      labelStyle={size === 'small' ? { fontSize: theme.fonts.labelLarge.fontSize - 1, marginVertical: 0 } : undefined}
+      disabled={off}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!off, busy: !!loading }}
+      style={({ pressed }) => [
+        styles.button,
+        { height: small ? 38 : 48, paddingHorizontal: small ? 14 : 20 },
+        variant === 'text'
+          ? pressed && neu(theme, 'inset', 2)
+          : neu(theme, pressed ? 'inset' : 'raised', pressed ? 3 : small ? 3 : 5),
+        filled && { backgroundColor: fill },
+        disabled && !loading && { opacity: 0.45 },
+        style,
+      ]}
     >
-      {label}
-    </PaperButton>
+      {loading ? (
+        <ActivityIndicator size={16} color={fg} />
+      ) : icon ? (
+        <Icon source={icon} size={small ? 16 : 18} color={fg} />
+      ) : null}
+      <Text
+        numberOfLines={1}
+        style={{ color: fg, fontFamily: FONT.bold, fontSize: theme.fonts.labelLarge.fontSize - (small ? 1 : 0) }}
+      >
+        {label}
+      </Text>
+    </Pressable>
   );
 }
+
+/** Two-to-four option picker: a pressed-in track with the chosen option raised out of it. */
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  options: readonly { value: T; label: string; icon?: IconName }[];
+}) {
+  const theme = useAppTheme();
+  return (
+    <View style={[styles.segmented, neu(theme, 'inset', 4)]} accessibilityRole="radiogroup">
+      {options.map((o) => {
+        const active = o.value === value;
+        const color = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
+        return (
+          <Pressable
+            key={o.value}
+            onPress={() => onChange(o.value)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: active }}
+            accessibilityLabel={o.label}
+            style={[styles.segment, active && neu(theme, 'raised', 3)]}
+          >
+            {o.icon && <Icon source={o.icon} size={16} color={color} />}
+            <Text numberOfLines={1} style={{ color, fontFamily: active ? FONT.bold : FONT.medium, fontSize: theme.fonts.labelLarge.fontSize }}>
+              {o.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Soft switch: pressed-in track, raised knob that turns the accent colour when on. Display only. */
+export function NeuSwitch({ value, disabled, color }: { value: boolean; disabled?: boolean; color?: string }) {
+  const theme = useAppTheme();
+  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, { toValue: value ? 1 : 0, duration: 180, useNativeDriver: true }).start();
+  }, [anim, value]);
+
+  return (
+    <View style={[styles.switchTrack, neu(theme, 'inset', 3), disabled && { opacity: 0.45 }]}>
+      <Animated.View
+        style={[
+          styles.switchKnob,
+          neu(theme, 'raised', 2),
+          value && { backgroundColor: color ?? theme.colors.primary },
+          { transform: [{ translateX: anim.interpolate({ inputRange: [0, 1], outputRange: [0, SWITCH_TRAVEL] }) }] },
+        ]}
+      />
+    </View>
+  );
+}
+
+const SWITCH_TRAVEL = 22;
 
 /**
  * On/off switch that changes only on a tap. Android's native switch also flips when a finger
  * drags across it, so swiping or scrolling over a list could toggle several switches at once.
- * Here the switch ignores touches itself and the surrounding Pressable handles taps only.
+ * Here the switch is display-only and the surrounding Pressable handles taps.
  */
 export function TapSwitch({
   value,
   onValueChange,
   disabled,
   accessibilityLabel,
-  ...switchProps
+  color,
 }: {
   value: boolean;
   onValueChange: (value: boolean) => void;
   disabled?: boolean;
   accessibilityLabel?: string;
-} & Omit<React.ComponentProps<typeof Switch>, 'value' | 'onValueChange' | 'disabled'>) {
+  color?: string;
+}) {
   return (
     <Pressable
       onPress={() => onValueChange(!value)}
@@ -401,13 +484,12 @@ export function TapSwitch({
       accessibilityState={{ checked: value, disabled }}
       accessibilityLabel={accessibilityLabel}
     >
-      <View pointerEvents="none">
-        <Switch value={value} disabled={disabled} {...switchProps} />
-      </View>
+      <NeuSwitch value={value} disabled={disabled} color={color} />
     </Pressable>
   );
 }
 
+/** Round raised icon button that presses in on touch. */
 export function IconButton({
   icon,
   onPress,
@@ -423,20 +505,27 @@ export function IconButton({
   disabled?: boolean;
   label: string;
   size?: number;
+  /** Accent-coloured icon. */
   tonal?: boolean;
 }) {
   const theme = useAppTheme();
+  const box = size + 18;
   return (
-    <PaperIconButton
-      icon={icon}
-      size={size}
+    <Pressable
       onPress={onPress}
       disabled={disabled}
+      hitSlop={4}
+      accessibilityRole="button"
       accessibilityLabel={label}
-      iconColor={color ?? theme.colors.onSurfaceVariant}
-      mode={tonal ? 'contained-tonal' : undefined}
-      style={{ margin: 0 }}
-    />
+      accessibilityState={{ disabled }}
+      style={({ pressed }) => [
+        styles.tile,
+        { width: box, height: box, borderRadius: box / 2 },
+        disabled ? { opacity: 0.35 } : neu(theme, pressed ? 'inset' : 'raised', pressed ? 2 : 3),
+      ]}
+    >
+      <Icon source={icon} size={size} color={color ?? (tonal ? theme.colors.primary : theme.colors.onSurfaceVariant)} />
+    </Pressable>
   );
 }
 
@@ -458,8 +547,8 @@ export function Label({
   const t = theme.custom.tones[tone];
   const fg = variant === 'filled' ? '#FFFFFF' : t.fg;
   return (
-    <View style={[styles.label, { backgroundColor: variant === 'filled' ? t.main : t.bg }]}>
-      {icon && <Icon source={icon} size={13} color={fg} />}
+    <View style={[styles.label, neu(theme, 'raised', 2), variant === 'filled' && { backgroundColor: t.main }]}>
+      {icon && <Icon source={icon} size={12} color={variant === 'filled' ? fg : t.main} />}
       <Text variant="labelSmall" style={{ color: fg }}>
         {children}
       </Text>
@@ -470,7 +559,7 @@ export function Label({
 export function ChipList({ items, max = 6 }: { items: string[]; max?: number }) {
   const theme = useAppTheme();
   const chip = (text: string) => (
-    <View key={text} style={[styles.chip, { backgroundColor: theme.colors.surfaceVariant }]}>
+    <View key={text} style={[styles.chip, neu(theme, 'inset', 2)]}>
       <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
         {text}
       </Text>
@@ -497,9 +586,11 @@ export function EmptyState({
 }) {
   const theme = useAppTheme();
   return (
-    <View style={[styles.empty, { backgroundColor: theme.custom.neutral }]}>
-      <IconTile icon={icon} tone="default" size={52} />
-      <Text variant="titleSmall" style={{ color: theme.colors.onSurface, marginTop: 6 }}>
+    <View style={[styles.empty, neu(theme, 'inset', 5)]}>
+      <View style={[styles.tile, neu(theme, 'raised', 5), { width: 56, height: 56, borderRadius: 28 }]}>
+        <Icon source={icon} size={26} color={theme.colors.onSurfaceVariant} />
+      </View>
+      <Text variant="titleSmall" style={{ color: theme.colors.onSurface, marginTop: 10 }}>
         {title}
       </Text>
       {description && (
@@ -523,8 +614,10 @@ function Banner({ tone, icon, message }: { tone: Tone; icon: IconName; message: 
   const theme = useAppTheme();
   const t = theme.custom.tones[tone];
   return (
-    <View style={[styles.banner, { backgroundColor: t.bg }]}>
-      <Icon source={icon} size={20} color={t.fg} />
+    <View style={[styles.banner, neu(theme, 'inset', 4)]}>
+      <View style={[styles.tile, neu(theme, 'raised', 3), { width: 34, height: 34, borderRadius: 17 }]}>
+        <Icon source={icon} size={18} color={t.main} />
+      </View>
       <Text variant="bodyMedium" style={{ flex: 1, color: t.fg }}>
         {message}
       </Text>
@@ -539,7 +632,7 @@ export const WarningBanner = ({ message }: { message: string }) => (
   <Banner tone="warning" icon="alert-outline" message={message} />
 );
 
-// ---------------------------------------------------------------------- Toast (Snackbar)
+// ---------------------------------------------------------------------- Toast
 
 type ToastState = { message: string; tone: 'success' | 'error'; key: number } | null;
 
@@ -551,10 +644,12 @@ export const toast = {
   error: (message: string) => hosts.at(-1)?.({ message, tone: 'error', key: Date.now() }),
 };
 
+/** Raised soft toast above the tab bar; hides itself after a few seconds. */
 export function ToastHost() {
   const theme = useAppTheme();
   const [state, setState] = useState<ToastState>(null);
   const [visible, setVisible] = useState(false);
+  const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const show = (t: ToastState) => {
@@ -567,32 +662,40 @@ export function ToastHost() {
     };
   }, []);
 
-  const tone = state?.tone === 'error' ? theme.custom.tones.error : theme.custom.tones.success;
+  useEffect(() => {
+    Animated.timing(fade, { toValue: visible ? 1 : 0, duration: 180, useNativeDriver: true }).start();
+    if (!visible) return;
+    const timer = setTimeout(() => setVisible(false), 2800);
+    return () => clearTimeout(timer);
+  }, [fade, visible, state?.key]);
+
+  if (!state) return null;
+  const tone = state.tone === 'error' ? theme.custom.tones.error : theme.custom.tones.success;
 
   return (
-    <Snackbar
-      key={state?.key}
-      visible={visible}
-      onDismiss={() => setVisible(false)}
-      duration={2800}
-      wrapperStyle={{ bottom: 104 }}
-      style={{ borderRadius: 14, backgroundColor: theme.colors.inverseSurface }}
-      icon="close"
-      onIconPress={() => setVisible(false)}
+    <Animated.View
+      pointerEvents={visible ? 'box-none' : 'none'}
+      style={[
+        styles.toastWrap,
+        { opacity: fade, transform: [{ translateY: fade.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] },
+      ]}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Icon source={state?.tone === 'error' ? 'alert-circle' : 'check-circle'} size={20} color={tone.main} />
-        <Text variant="bodyMedium" style={{ color: theme.colors.inverseOnSurface, flexShrink: 1 }}>
-          {state?.message}
+      <View style={[styles.toast, neu(theme, 'raised', 7)]} accessibilityLiveRegion="polite">
+        <View style={[styles.tile, neu(theme, 'inset', 3), { width: 34, height: 34, borderRadius: 17 }]}>
+          <Icon source={state.tone === 'error' ? 'alert-circle' : 'check-circle'} size={20} color={tone.main} />
+        </View>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurface, flex: 1 }}>
+          {state.message}
         </Text>
+        <IconButton icon="close" label="Dismiss" size={16} onPress={() => setVisible(false)} />
       </View>
-    </Snackbar>
+    </Animated.View>
   );
 }
 
 // ---------------------------------------------------------------------- Confirm dialog
 
-/** Material confirm dialog (replaces the native Alert so it matches the theme). */
+/** Soft confirm dialog (replaces the native Alert so it matches the theme). */
 export function ConfirmDialog({
   visible,
   title,
@@ -624,8 +727,12 @@ export function ConfirmDialog({
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, borderRadius: 24 }}>
-        <Dialog.Icon icon={icon} color={theme.colors.error} />
+      <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.background, borderRadius: 28 }}>
+        <View style={{ alignItems: 'center', paddingTop: 4 }}>
+          <View style={[styles.tile, neu(theme, 'raised', 5), { width: 60, height: 60, borderRadius: 30 }]}>
+            <Icon source={icon} size={26} color={theme.colors.error} />
+          </View>
+        </View>
         <Dialog.Title style={{ textAlign: 'center' }}>{title}</Dialog.Title>
         {content ? (
           <Dialog.Content>
@@ -634,21 +741,9 @@ export function ConfirmDialog({
             </Text>
           </Dialog.Content>
         ) : null}
-        <Dialog.Actions>
-          <PaperButton onPress={onDismiss} textColor={theme.colors.onSurfaceVariant}>
-            Cancel
-          </PaperButton>
-          <PaperButton
-            mode="contained"
-            buttonColor={theme.colors.error}
-            textColor="#FFFFFF"
-            loading={busy}
-            disabled={busy}
-            onPress={confirm}
-            style={{ borderRadius: 12 }}
-          >
-            {confirmLabel}
-          </PaperButton>
+        <Dialog.Actions style={{ gap: 12, paddingHorizontal: 20, paddingBottom: 20 }}>
+          <Button variant="soft" tone="default" label="Cancel" onPress={onDismiss} style={{ flex: 1 }} />
+          <Button tone="error" label={confirmLabel} loading={busy} onPress={confirm} style={{ flex: 1 }} />
         </Dialog.Actions>
       </Dialog>
     </Portal>
@@ -658,19 +753,26 @@ export function ConfirmDialog({
 // ----------------------------------------------------------------------
 
 const styles = StyleSheet.create({
-  screen: { padding: 16, gap: 16, paddingBottom: 56 },
+  screen: { padding: 18, gap: 20, paddingBottom: 56 },
   tabHeader: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingHorizontal: 4, paddingBottom: 6 },
-  card: {
-    borderRadius: 20,
-    borderWidth: StyleSheet.hairlineWidth,
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-  },
-  cardInner: { borderRadius: 20, overflow: 'hidden' },
+  card: { borderRadius: 24 },
+  cardInner: { borderRadius: 24, overflow: 'hidden' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingVertical: 16 },
   cardBody: { padding: 18 },
   tile: { alignItems: 'center', justifyContent: 'center' },
+  button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 16 },
+  segmented: { flexDirection: 'row', padding: 5, borderRadius: 16, gap: 4 },
+  segment: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    height: 40,
+    borderRadius: 12,
+  },
+  switchTrack: { width: 52, height: 30, borderRadius: 15, padding: 3 },
+  switchKnob: { width: 24, height: 24, borderRadius: 12 },
   label: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -678,17 +780,19 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 9,
     height: 24,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  chip: { borderRadius: 10, paddingHorizontal: 9, paddingVertical: 4 },
   empty: {
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     margin: 16,
-    paddingVertical: 32,
+    paddingVertical: 28,
     paddingHorizontal: 16,
-    borderRadius: 16,
+    borderRadius: 20,
   },
-  banner: { flexDirection: 'row', gap: 12, padding: 14, borderRadius: 16, alignItems: 'center' },
+  banner: { flexDirection: 'row', gap: 12, padding: 12, borderRadius: 18, alignItems: 'center' },
+  toastWrap: { position: 'absolute', left: 16, right: 16, bottom: 110 },
+  toast: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingLeft: 12, borderRadius: 20 },
 });
