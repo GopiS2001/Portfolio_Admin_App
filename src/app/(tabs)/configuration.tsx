@@ -486,7 +486,7 @@ function SectionsList() {
         <View key={s.key} style={[styles.sectionRow, neu(theme, s.visible ? 'raised' : 'inset', 4)]}>
           <View style={{ alignItems: 'center', gap: 6 }}>
             <IconButton icon="chevron-up" label="Move up" size={18} disabled={i === 0} onPress={() => move(i, -1)} />
-            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginVertical: -4 }}>
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
               {i + 1}
             </Text>
             <IconButton icon="chevron-down" label="Move down" size={18} disabled={i === sections.length - 1} onPress={() => move(i, 1)} />
