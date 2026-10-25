@@ -2,23 +2,12 @@ import * as DocumentPicker from 'expo-document-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState, useCallback } from 'react';
 import { View, Image, Linking, Platform, Pressable, StyleSheet, ScrollView } from 'react-native';
-import {
-  Text,
-  Chip,
-  Icon,
-  Dialog,
-  Portal,
-  Switch,
-  TextInput,
-  HelperText,
-  RadioButton,
-  TouchableRipple,
-} from 'react-native-paper';
+import { Text, Icon, Dialog, Portal, TextInput, HelperText, RadioButton, TouchableRipple } from 'react-native-paper';
 
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { uploadFile, resolveFileUrl, resolveImageUrl } from '@/lib/api';
 
-import { toast, Button, IconButton } from './ui';
+import { toast, Button, NeuSwitch, IconButton, NeuPressable } from './ui';
 
 // ----------------------------------------------------------------------
 
