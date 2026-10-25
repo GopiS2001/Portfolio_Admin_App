@@ -17,6 +17,7 @@ export const DESIGN_STYLE_OPTIONS: { value: DesignStyle; label: string; caption:
   { value: 'glassmorphism', label: 'Glassmorphism', caption: 'Frosted glass' },
   { value: 'claymorphism', label: 'Claymorphism', caption: 'Puffy clay' },
   { value: 'skeuomorphism', label: 'Skeuomorphism', caption: 'Real materials' },
+  { value: 'zephyr', label: 'Zephyr', caption: 'Sage haze & serif' },
 ];
 
 /**
