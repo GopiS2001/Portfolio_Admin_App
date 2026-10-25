@@ -23,6 +23,14 @@ export default function TabLayout() {
   const theme = useAppTheme();
   const { data: summary } = useResource<Summary>(endpoints.summary);
 
+  // One design style for both: the app wears the website's saved style (set under
+  // Settings → Appearance). Follows the saved value, so discarded edits never restyle the app.
+  const { setDesignStyle } = usePreferences();
+  const savedStyle = useResource<Settings>(endpoints.settings).data?.designStyle;
+  useEffect(() => {
+    if (savedStyle && DESIGN_STYLES.includes(savedStyle)) setDesignStyle(savedStyle);
+  }, [savedStyle, setDesignStyle]);
+
   return (
     <Tabs
       tabBar={(props) => <FloatingTabBar {...props} />}
