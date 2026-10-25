@@ -34,6 +34,7 @@ import {
   NeuPressable,
   ConfirmDialog,
   GradientAvatar,
+  floatingFill,
   TAB_BAR_SPACE,
 } from '@/components/ui';
 
