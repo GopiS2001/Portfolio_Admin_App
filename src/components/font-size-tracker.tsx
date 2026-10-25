@@ -135,13 +135,13 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
 const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   valuePill: { paddingHorizontal: 12, height: 30, borderRadius: 15, justifyContent: 'center' },
-  preview: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 16 },
+  preview: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 18 },
   trackRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  line: { position: 'absolute', top: CURRENT / 2 + 4 - 2, height: 4, borderRadius: 2, overflow: 'hidden' },
+  line: { position: 'absolute', top: CURRENT / 2 + 4 - 4, height: 8, borderRadius: 4, padding: 2, overflow: 'hidden' },
   lineFill: { height: 4, borderRadius: 2 },
   step: { flex: 1, alignItems: 'center' },
   nodeBox: { height: CURRENT + 8, justifyContent: 'center', alignItems: 'center' },
-  node: { width: NODE, height: NODE, borderRadius: NODE / 2, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  node: { width: NODE, height: NODE, borderRadius: NODE / 2, alignItems: 'center', justifyContent: 'center' },
   halo: { width: CURRENT + 8, height: CURRENT + 8, borderRadius: (CURRENT + 8) / 2, alignItems: 'center', justifyContent: 'center' },
   currentNode: {
     width: CURRENT,
