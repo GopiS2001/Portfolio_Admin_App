@@ -701,7 +701,10 @@ export function ToastHost() {
         { opacity: fade, transform: [{ translateY: fade.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] },
       ]}
     >
-      <View style={[styles.toast, neu(theme, 'raised', 7)]} accessibilityLiveRegion="polite">
+      <View
+        style={[styles.toast, neu(theme, 'raised', 7), { backgroundColor: theme.custom.surface.solid }]}
+        accessibilityLiveRegion="polite"
+      >
         <View style={[styles.tile, neu(theme, 'inset', 3), { width: 34, height: 34, borderRadius: 17 }]}>
           <Icon source={state.tone === 'error' ? 'alert-circle' : 'check-circle'} size={20} color={tone.main} />
         </View>
