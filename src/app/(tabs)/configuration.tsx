@@ -491,7 +491,7 @@ function SectionsList() {
             </Text>
             <IconButton icon="chevron-down" label="Move down" size={18} disabled={i === sections.length - 1} onPress={() => move(i, 1)} />
           </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={{ flex: 1, minWidth: 0, opacity: s.visible ? 1 : 0.6 }}>
             <Text variant="titleSmall">{SECTION_LABELS[s.key]}</Text>
             <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
               Menu label: {s.navLabel || '—'}
