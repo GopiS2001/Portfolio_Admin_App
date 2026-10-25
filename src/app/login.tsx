@@ -121,6 +121,7 @@ export default function LoginScreen() {
             </Card>
 
             <View style={[styles.server, neu(theme, showServer ? 'raised' : 'inset', 4)]}>
+              {showServer && <GlassBlur radius={18} />}
               {showServer ? (
                 <View>
                   <Input
