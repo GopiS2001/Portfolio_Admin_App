@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { http, endpoints } from '@/lib/api';
 import { revalidate, useResource } from '@/lib/store';
 
