@@ -350,7 +350,7 @@ export function SelectField({
         <Dialog
           visible={open}
           onDismiss={() => setOpen(false)}
-          style={{ backgroundColor: theme.colors.surface, borderRadius: 24, maxHeight: '80%' }}
+          style={{ backgroundColor: theme.colors.background, borderRadius: 28, maxHeight: '80%' }}
         >
           <Dialog.Title>{field.label}</Dialog.Title>
           <Dialog.ScrollArea style={{ paddingHorizontal: 0, borderColor: theme.custom.divider }}>
