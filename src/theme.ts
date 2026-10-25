@@ -5,9 +5,9 @@ import type { DesignStyle } from '@/lib/preferences';
 import { useTheme, MD3DarkTheme, configureFonts, MD3LightTheme } from 'react-native-paper';
 
 // ----------------------------------------------------------------------
-// Material 3 theme for React Native Paper in a neumorphic (soft UI) style: every surface shares
-// one base colour and gets its depth from paired light/dark shadows (see `neu`). Emerald brand,
-// Plus Jakarta Sans, light + dark. Every screen reads colours from here.
+// Material 3 theme for React Native Paper: emerald brand, Plus Jakarta Sans, light + dark, in one
+// of four design styles (neumorphism, glassmorphism, claymorphism, skeuomorphism). Surfaces get
+// their look from `neu`, which draws the active style. Every screen reads colours from here.
 
 export const FONT = {
   regular: 'PlusJakartaSans_400Regular',
