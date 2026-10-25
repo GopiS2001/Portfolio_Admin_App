@@ -143,9 +143,13 @@ export function Input(
   // no typing, no deleting. Use the normal keyboard there, without auto-correct for links.
   const isUrl = keyboardType === 'url';
   const safeKeyboard = isUrl && Platform.OS === 'android' ? 'default' : keyboardType;
-  const rim = invalid ? theme.colors.error : focused ? theme.colors.primary : 'transparent';
+  const rim = invalid
+    ? theme.colors.error
+    : focused
+      ? theme.colors.primary
+      : (theme.custom.surface.wellBorder ?? 'transparent');
   return (
-    <View style={[styles.inputWell, neu(theme, 'inset', 4), { borderColor: rim }, style]}>
+    <View style={[styles.inputWell, neu(theme, 'inset', 4), { borderWidth: 1.5, borderColor: rim }, style]}>
       <TextInput
         mode="flat"
         error={invalid}
