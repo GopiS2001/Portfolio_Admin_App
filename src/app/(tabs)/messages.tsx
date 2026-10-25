@@ -112,6 +112,7 @@ export default function MessagesScreen() {
     const accent = theme.custom.tones.info;
     return (
       <View key={m.id} style={[styles.card, neu(theme, 'raised', isOpen ? 8 : 6)]}>
+        <GlassBlur radius={22} />
         <View style={styles.cardInner}>
           {!m.read && <View style={[styles.accent, { backgroundColor: accent.main }]} />}
           <TouchableRipple onPress={() => open(m)}>
