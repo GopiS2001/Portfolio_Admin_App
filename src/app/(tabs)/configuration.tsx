@@ -431,10 +431,17 @@ function Stepper({
           />
         </View>
       </View>
-      <ProgressBar
-        progress={Math.max(0, Math.min(1, (value - min) / (max - min)))}
-        style={{ height: 6, borderRadius: 3, marginTop: 10 }}
-      />
+      {/* Engraved groove with the filled part */}
+      <View style={[styles.groove, neu(theme, 'inset', 2)]}>
+        <View
+          style={{
+            width: `${Math.max(0, Math.min(1, (value - min) / (max - min))) * 100}%`,
+            height: '100%',
+            borderRadius: 4,
+            backgroundColor: theme.colors.primary,
+          }}
+        />
+      </View>
     </View>
   );
 }
