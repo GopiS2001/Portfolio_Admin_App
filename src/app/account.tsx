@@ -70,13 +70,8 @@ export default function AccountScreen() {
   return (
     <Screen>
       <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-        <Avatar.Text
-          size={76}
-          label={(user?.displayName ?? 'A').slice(0, 1).toUpperCase()}
-          style={{ backgroundColor: theme.colors.primaryContainer }}
-          labelStyle={{ color: theme.colors.onPrimaryContainer, fontFamily: theme.fonts.headlineMedium.fontFamily }}
-        />
-        <Text variant="titleLarge" style={{ marginTop: 12 }}>
+        <GradientAvatar name={user?.displayName} size={88} />
+        <Text variant="titleLarge" style={{ marginTop: 18 }}>
           {user?.displayName}
         </Text>
         <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
