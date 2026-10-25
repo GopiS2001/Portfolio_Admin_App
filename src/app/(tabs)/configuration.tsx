@@ -497,7 +497,7 @@ function SectionsList() {
               Menu label: {s.navLabel || '—'}
             </Text>
           </View>
-          <View style={{ gap: 4 }}>
+          <View style={{ gap: 10 }}>
             <View style={styles.switchLine}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
                 Site
