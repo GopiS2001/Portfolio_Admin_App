@@ -371,6 +371,7 @@ function Group({
 
   return (
     <View style={[styles.group, neu(theme, 'raised', open ? 7 : 6)]}>
+      <GlassBlur radius={24} />
       <View style={{ borderRadius: 24, overflow: 'hidden' }}>
         <TouchableRipple onPress={toggle}>
           <View style={styles.groupHeader}>
