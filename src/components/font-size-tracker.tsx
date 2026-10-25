@@ -76,14 +76,7 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
                       </View>
                     </View>
                   ) : (
-                    <View
-                      style={[
-                        styles.node,
-                        done
-                          ? { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }
-                          : { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline },
-                      ]}
-                    >
+                    <View style={[styles.node, neu(theme, 'raised', 2), done && { backgroundColor: theme.colors.primary }]}>
                       {done && <Icon source="check" size={13} color={theme.colors.onPrimary} />}
                     </View>
                   )}
