@@ -200,10 +200,18 @@ export default function ConfigurationScreen() {
           icon="cellphone-cog"
           tile="violet"
           title="App preferences"
-          summary={`${APP_THEMES.find((t) => t.value === themePreference)?.label} theme · ${fontSize} px text`}
+          summary={`${DESIGN_STYLE_OPTIONS.find((s) => s.value === designStyle)?.label} · ${APP_THEMES.find((t) => t.value === themePreference)?.label} · ${fontSize} px`}
           defaultOpen
         >
           <View style={{ gap: 22 }}>
+            <View>
+              <Text variant="titleSmall">Design style</Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 12 }}>
+                Changes the look of every screen right away
+              </Text>
+              <DesignStylePicker value={designStyle} onChange={setDesignStyle} />
+            </View>
+            <Divider />
             <View>
               <Text variant="titleSmall">Theme</Text>
               <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 10 }}>
