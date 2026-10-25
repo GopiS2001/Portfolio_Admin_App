@@ -40,7 +40,7 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
         </View>
       </View>
 
-      <View style={[styles.preview, { backgroundColor: theme.custom.neutral }]}>
+      <View style={[styles.preview, neu(theme, 'inset', 5)]}>
         <Text style={{ fontFamily: FONT.bold, fontSize: value * 1.6, lineHeight: value * 2, color: theme.colors.onSurface }}>Aa</Text>
         <Text style={{ flex: 1, fontFamily: FONT.regular, fontSize: value, lineHeight: value * 1.45, color: theme.colors.onSurfaceVariant }}>
           This is how text will look across the app.
