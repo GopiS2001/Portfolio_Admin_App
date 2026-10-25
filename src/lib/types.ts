@@ -43,6 +43,9 @@ export type Settings = {
   defaultTheme: ThemeMode;
   accentLight: string;
   accentDark: string;
+  /** The website's surface look (older servers may not send it). */
+  designStyle?: DesignStyle;
+  enableStyleSwitcher?: boolean;
   fontSans: string;
   fontSerif: string;
   baseFontSize: number;
