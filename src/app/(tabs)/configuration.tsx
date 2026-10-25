@@ -265,7 +265,7 @@ export default function ConfigurationScreen() {
           icon="theme-light-dark"
           tile="rose"
           title="Appearance"
-          summary={`${THEMES.find((t) => t.value === v.defaultTheme)?.label ?? 'Device'} theme · ${v.enableThemeToggle ? 'toggle on' : 'toggle off'}`}
+          summary={`${DESIGN_STYLE_OPTIONS.find((s) => s.value === v.designStyle)?.label ?? 'Neumorphism'} · ${THEMES.find((t) => t.value === v.defaultTheme)?.label ?? 'Device'} theme`}
         >
           <View style={{ gap: 16 }}>
             <FormFields fields={THEME_FIELDS.slice(0, 1)} form={form} />
@@ -274,6 +274,14 @@ export default function ConfigurationScreen() {
                 Default theme
               </Text>
               <Segmented<ThemeMode> value={v.defaultTheme} onChange={(t) => form.set('defaultTheme', t)} options={THEMES} />
+            </View>
+            {/* The website's look for every visitor — separate from this app's own style above */}
+            <View>
+              <Text variant="titleSmall">Website design style</Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 12 }}>
+                Cards, buttons, fields and the menu on your website
+              </Text>
+              <DesignStylePicker value={v.designStyle} onChange={(s) => form.set('designStyle', s)} />
             </View>
             <FormFields fields={THEME_FIELDS.slice(1)} form={form} />
           </View>
