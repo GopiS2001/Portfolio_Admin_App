@@ -20,7 +20,8 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 10) + 4 }]}>
-      <View style={[styles.bar, neu(theme, 'raised', 8)]}>
+      {/* Opaque fill: in glass mode the content scrolls underneath */}
+      <View style={[styles.bar, neu(theme, 'raised', 8), { backgroundColor: theme.custom.surface.solid }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
