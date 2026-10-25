@@ -5,20 +5,12 @@ import type { Section, Settings, ThemeMode } from '@/lib/types';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
 import { useMemo, useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Platform, UIManager, StyleSheet, LayoutAnimation } from 'react-native';
-import {
-  Text,
-  Surface,
-  ProgressBar,
-  TouchableRipple,
-  SegmentedButtons,
-  Button as PaperButton,
-} from 'react-native-paper';
+import { Text, TouchableRipple } from 'react-native-paper';
 
 import { useAuth } from '@/lib/auth';
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { usePreferences } from '@/lib/preferences';
 import { FontSizeTracker } from '@/components/font-size-tracker';
 import { http, endpoints as api } from '@/lib/api';
