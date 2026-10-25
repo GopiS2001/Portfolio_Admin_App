@@ -45,25 +45,22 @@ export default function LoginScreen() {
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 24 }} keyboardShouldPersistTaps="handled">
-          <LinearGradient
-            colors={theme.custom.gradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.hero, { paddingTop: insets.top + 48 }]}
-          >
-            <View style={styles.glow} />
-            <Image
-              source={require('../../assets/logo.png')}
-              style={styles.logo}
-              accessibilityLabel="Portfolio Admin logo"
-            />
-            <Text variant="headlineMedium" style={{ color: '#FFFFFF' }}>
-              Portfolio Admin
-            </Text>
-            <Text variant="bodyMedium" style={{ color: 'rgba(255,255,255,0.75)', marginTop: 4 }}>
+          <View style={[styles.hero, { paddingTop: insets.top + 40 }]}>
+            {/* Logo sits in a pressed-in socket on a raised disc */}
+            <View style={[styles.logoDisc, neu(theme, 'raised', 10)]}>
+              <View style={[styles.logoSocket, neu(theme, 'inset', 5)]}>
+                <Image
+                  source={require('../../assets/logo.png')}
+                  style={styles.logo}
+                  accessibilityLabel="Portfolio Admin logo"
+                />
+              </View>
+            </View>
+            <Text variant="headlineMedium">Portfolio Admin</Text>
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
               Manage your website from anywhere.
             </Text>
-          </LinearGradient>
+          </View>
 
           <View style={styles.cardWrap}>
             <Card>
