@@ -72,14 +72,10 @@ export function SectionHeadingCard({ sectionKey }: { sectionKey: SectionKey }) {
 
       {sectionKey !== 'home' && (
         <View
-          style={{
-            marginTop: 18,
-            padding: 18,
-            borderRadius: 16,
-            backgroundColor: theme.custom.neutral,
-            borderLeftWidth: 3,
-            borderLeftColor: accent,
-          }}
+          style={[
+            { marginTop: 20, padding: 18, borderRadius: 18, borderLeftWidth: 3, borderLeftColor: accent },
+            neu(theme, 'inset', 5),
+          ]}
         >
           <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, letterSpacing: 1.5 }}>
             PREVIEW
