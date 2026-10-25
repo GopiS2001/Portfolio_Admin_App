@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/auth';
 import { neu, useAppTheme } from '@/theme';
 import { usePreferences } from '@/lib/preferences';
 import { FontSizeTracker } from '@/components/font-size-tracker';
+import { DesignStylePicker, DESIGN_STYLE_OPTIONS } from '@/components/style-picker';
 import { http, endpoints as api } from '@/lib/api';
 import { saveSection } from '@/components/section-heading-card';
 import { SANS_FONTS, SERIF_FONTS, SECTION_LABELS } from '@/lib/options';
