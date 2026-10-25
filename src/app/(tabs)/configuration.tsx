@@ -26,6 +26,7 @@ import {
   Screen,
   Divider,
   TabHeader,
+  GlassBlur,
   Segmented,
   TapSwitch,
   IconButton,
