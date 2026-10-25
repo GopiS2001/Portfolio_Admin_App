@@ -252,11 +252,7 @@ export default function ConfigurationScreen() {
               <Text variant="titleSmall" style={{ marginBottom: 10 }}>
                 Default theme
               </Text>
-              <SegmentedButtons
-                value={v.defaultTheme}
-                onValueChange={(t) => form.set('defaultTheme', t)}
-                buttons={THEMES.map((t) => ({ value: t.value, label: t.label, icon: t.icon }))}
-              />
+              <Segmented<ThemeMode> value={v.defaultTheme} onChange={(t) => form.set('defaultTheme', t)} options={THEMES} />
             </View>
             <FormFields fields={THEME_FIELDS.slice(1)} form={form} />
           </View>
