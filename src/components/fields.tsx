@@ -143,24 +143,35 @@ export function Input(
   // no typing, no deleting. Use the normal keyboard there, without auto-correct for links.
   const isUrl = keyboardType === 'url';
   const safeKeyboard = isUrl && Platform.OS === 'android' ? 'default' : keyboardType;
+  const rim = invalid ? theme.colors.error : focused ? theme.colors.primary : 'transparent';
   return (
-    <TextInput
-      mode="outlined"
-      error={invalid}
-      multiline={multiline}
-      outlineStyle={{ borderRadius: 14, borderWidth: 1 }}
-      outlineColor={theme.colors.outline}
-      activeOutlineColor={theme.colors.primary}
-      placeholderTextColor={theme.colors.onSurfaceVariant}
-      keyboardType={safeKeyboard}
-      {...(isUrl ? { autoCapitalize: 'none' as const, autoCorrect: false } : null)}
-      {...rest}
-      style={[
-        { backgroundColor: theme.colors.surface, fontSize: theme.fonts.bodyMedium.fontSize + 1 },
-        multiline && { minHeight: 110 },
-        style,
-      ]}
-    />
+    <View style={[styles.inputWell, neu(theme, 'inset', 4), { borderColor: rim }, style]}>
+      <TextInput
+        mode="flat"
+        error={invalid}
+        multiline={multiline}
+        // The well is the field: no fill and no underline (its active colour still tints the label)
+        underlineColor="transparent"
+        activeUnderlineColor={theme.colors.primary}
+        underlineStyle={{ height: 0 }}
+        placeholderTextColor={theme.colors.onSurfaceVariant}
+        keyboardType={safeKeyboard}
+        {...(isUrl ? { autoCapitalize: 'none' as const, autoCorrect: false } : null)}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
+        {...rest}
+        style={[
+          { backgroundColor: 'transparent', fontSize: theme.fonts.bodyMedium.fontSize + 1 },
+          multiline && { minHeight: 110 },
+        ]}
+      />
+    </View>
   );
 }
 
