@@ -88,6 +88,24 @@ export function Screen({
       )}
       {children}
     </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * Page decoration behind the content for styles that need it — glassmorphism paints a colourful
+ * gradient with two soft orbs so the translucent panes have something to frost. Others: nothing.
+ */
+export function Backdrop() {
+  const theme = useAppTheme();
+  const colors = theme.custom.surface.backdrop;
+  if (!colors) return null;
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+      <View style={[styles.orb, { top: -70, right: -90, backgroundColor: colors[2] }]} />
+      <View style={[styles.orb, { bottom: 60, left: -110, backgroundColor: colors[0] }]} />
+    </View>
   );
 }
 
