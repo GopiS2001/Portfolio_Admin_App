@@ -165,7 +165,7 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </GlassScene>
   );
 }
 
