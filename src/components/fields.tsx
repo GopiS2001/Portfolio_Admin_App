@@ -131,12 +131,13 @@ export function Helper({ text, error }: { text?: string; error?: string }) {
   );
 }
 
-/** Outlined Material text field with a floating label. */
+/** Text field pressed into the page (soft UI) with a floating label; the rim tints on focus / error. */
 export function Input(
   props: Omit<React.ComponentProps<typeof TextInput>, 'mode' | 'error'> & { invalid?: boolean }
 ) {
   const theme = useAppTheme();
-  const { invalid, style, multiline, keyboardType, ...rest } = props;
+  const { invalid, style, multiline, keyboardType, onFocus, onBlur, ...rest } = props;
+  const [focused, setFocused] = useState(false);
   // React Native's Android TextInput clears the text input class for keyboardType="url"
   // (it sets only TYPE_TEXT_VARIATION_URI), which leaves the field non-editable: no cursor,
   // no typing, no deleting. Use the normal keyboard there, without auto-correct for links.
