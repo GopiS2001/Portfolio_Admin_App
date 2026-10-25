@@ -405,7 +405,7 @@ function Stepper({
 }) {
   const theme = useAppTheme();
   return (
-    <View style={[styles.stepper, { backgroundColor: theme.custom.neutral }]}>
+    <View style={[styles.stepper, neu(theme, 'raised', 4)]}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <Text variant="titleSmall">{label}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
