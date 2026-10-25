@@ -317,9 +317,10 @@ export default function ConfigurationScreen() {
           style={[
             styles.saveBar,
             neu(theme, 'raised', 8),
-            { backgroundColor: theme.custom.surface.solid, bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 },
+            { backgroundColor: floatingFill(theme), bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 },
           ]}
         >
+          <GlassBlur radius={22} intensity={60} />
           <Icon source="pencil-circle" size={22} color={theme.colors.primary} />
           <Text variant="labelLarge" style={{ flex: 1 }}>
             Unsaved changes
