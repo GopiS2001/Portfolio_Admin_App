@@ -68,12 +68,15 @@ export default function RootLayout() {
   );
 }
 
-/** Applies the app preferences: light/dark/system theme and text size. */
+/** Applies the app preferences: light/dark/system theme, design style and text size. */
 function ThemedApp() {
   const scheme = useColorScheme();
-  const { ready, themePreference, fontScale } = usePreferences();
+  const { ready, themePreference, designStyle, fontScale } = usePreferences();
   const dark = themePreference === 'system' ? scheme === 'dark' : themePreference === 'dark';
-  const theme = useMemo(() => withFontScale(dark ? darkTheme : lightTheme, fontScale), [dark, fontScale]);
+  const theme = useMemo(
+    () => withFontScale(makeTheme(dark, designStyle), fontScale),
+    [dark, designStyle, fontScale]
+  );
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
