@@ -6,6 +6,7 @@ import { View, Linking, Animated, Pressable, StyleSheet, ScrollView, RefreshCont
 import { Text, Icon, Dialog, Portal, ActivityIndicator } from 'react-native-paper';
 
 import Svg, { Circle } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { neu, FONT, TILES, useAppTheme } from '@/theme';
