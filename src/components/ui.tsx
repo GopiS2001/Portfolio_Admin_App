@@ -255,6 +255,7 @@ export function NeuPressable({
         style,
       ]}
     >
+      <GlassBlur radius={radiusOf(style)} />
       {children}
     </Pressable>
   );
