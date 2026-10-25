@@ -330,7 +330,7 @@ export default function ConfigurationScreen() {
 
 // ----------------------------------------------------------------------
 
-/** Collapsible settings group: gradient icon, title, live summary, chevron. */
+/** Collapsible raised settings group: icon tile, title, live summary, chevron. */
 function Group({
   icon,
   tile,
