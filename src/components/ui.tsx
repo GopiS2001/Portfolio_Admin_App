@@ -435,7 +435,7 @@ export function Segmented<T extends string>({
 /** Soft switch: pressed-in track, raised knob that turns the accent colour when on. Display only. */
 export function NeuSwitch({ value, disabled, color }: { value: boolean; disabled?: boolean; color?: string }) {
   const theme = useAppTheme();
-  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const [anim] = useState(() => new Animated.Value(value ? 1 : 0));
 
   useEffect(() => {
     Animated.timing(anim, { toValue: value ? 1 : 0, duration: 180, useNativeDriver: true }).start();
