@@ -621,13 +621,16 @@ function UploadField({
 
 const styles = StyleSheet.create({
   helper: { paddingHorizontal: 4, paddingTop: 2, paddingBottom: 0 },
+  inputWell: { borderRadius: 16, borderWidth: 1.5, paddingHorizontal: 2, paddingBottom: 2 },
   adornment: { position: 'absolute', top: 6, bottom: 0, justifyContent: 'center' },
-  switchRow: { borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
+  switchRow: { borderRadius: 18, paddingHorizontal: 16, paddingVertical: 14 },
   option: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 6 },
-  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
-  linkRow: { flexDirection: 'row', gap: 8, alignItems: 'center', padding: 10, borderRadius: 14 },
+  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  tag: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 12, paddingRight: 5, height: 32, borderRadius: 16 },
+  tagClose: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  linkRow: { flexDirection: 'row', gap: 10, alignItems: 'center', padding: 12, borderRadius: 18 },
   colorDot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1 },
-  upload: { borderWidth: 1, borderStyle: 'dashed', borderRadius: 16, padding: 14 },
+  upload: { borderRadius: 20, padding: 14 },
   thumb: {
     width: 56,
     height: 56,
