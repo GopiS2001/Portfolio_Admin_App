@@ -249,7 +249,7 @@ function ItemEditor<T extends Ordered>({
             </ScrollView>
           </KeyboardAvoidingView>
           <ToastHost />
-        </View>
+        </GlassScene>
       </Portal.Host>
     </Modal>
   );
