@@ -556,9 +556,9 @@ function UploadField({
   const fileName = value ? value.split('/').pop() : 'Nothing uploaded';
 
   return (
-    <View style={[styles.upload, { borderColor: theme.colors.outline }]}>
+    <View style={[styles.upload, neu(theme, 'raised', 4)]}>
       <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-        <View style={[styles.thumb, { backgroundColor: theme.custom.neutral }]}>
+        <View style={[styles.thumb, neu(theme, 'inset', 3)]}>
           {isImage && preview ? (
             <Image source={{ uri: preview }} style={{ width: '100%', height: '100%' }} />
           ) : (
