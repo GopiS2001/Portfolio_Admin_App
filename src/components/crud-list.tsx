@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Modal, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { Text, Portal, Appbar } from 'react-native-paper';
 
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { createItem, deleteItem, updateItem, useResource, reorderItems } from '@/lib/store';
 
 import { FormFields, useFieldForm } from './fields';
