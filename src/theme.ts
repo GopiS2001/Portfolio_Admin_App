@@ -6,7 +6,7 @@ import { useTheme, MD3DarkTheme, configureFonts, MD3LightTheme } from 'react-nat
 
 // ----------------------------------------------------------------------
 // Material 3 theme for React Native Paper: emerald brand, Plus Jakarta Sans, light + dark, in one
-// of four design styles (neumorphism, glassmorphism, claymorphism, skeuomorphism). Surfaces get
+// of five design styles (neumorphism, glassmorphism, claymorphism, skeuomorphism, zephyr). Surfaces get
 // their look from `neu`, which draws the active style. Every screen reads colours from here.
 
 export const FONT = {
