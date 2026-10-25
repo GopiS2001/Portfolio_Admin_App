@@ -170,30 +170,19 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    paddingHorizontal: 24,
-    paddingBottom: 72,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    overflow: 'hidden',
+  hero: { alignItems: 'center', paddingHorizontal: 24, paddingBottom: 32 },
+  logoDisc: {
+    width: 124,
+    height: 124,
+    borderRadius: 62,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
-  glow: {
-    position: 'absolute',
-    right: -60,
-    top: -40,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  /** Round app logo (assets/logo.png) — no tile behind it. */
-  logo: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    marginBottom: 20,
-  },
-  cardWrap: { paddingHorizontal: 16, marginTop: -44, gap: 14 },
-  server: { borderRadius: 16, padding: 8, gap: 4 },
+  logoSocket: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center' },
+  /** Round app logo (assets/logo.png). */
+  logo: { width: 80, height: 80, borderRadius: 40 },
+  cardWrap: { paddingHorizontal: 18, gap: 20 },
+  server: { borderRadius: 18, padding: 8, gap: 4 },
   serverRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 8, paddingVertical: 8 },
 });
