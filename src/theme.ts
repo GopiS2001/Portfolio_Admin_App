@@ -162,7 +162,7 @@ export const PALETTES: Record<DesignStyle, { light: Palette; dark: Palette }> = 
   glassmorphism: {
     light: {
       background: '#C9D6FF',
-      fill: 'rgba(255, 255, 255, 0.42)',
+      fill: 'rgba(255, 255, 255, 0.3)',
       well: 'rgba(255, 255, 255, 0.2)',
       solid: 'rgba(238, 243, 255, 0.94)',
       onSurface: '#1E2433',
