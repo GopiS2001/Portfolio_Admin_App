@@ -115,7 +115,7 @@ export function CrudList<T extends Ordered>({
             </View>
           </View>
 
-          <View style={[styles.toolbar, { backgroundColor: theme.custom.neutral }]}>
+          <View style={[styles.toolbar, neu(theme, 'inset', 4)]}>
             <IconButton icon="chevron-up" label="Move up" size={18} disabled={index === 0} onPress={() => move(index, -1)} />
             <IconButton
               icon="chevron-down"
