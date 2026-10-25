@@ -188,7 +188,7 @@ export default function ConfigurationScreen() {
             </View>
             <Icon source="chevron-right" size={22} color={theme.colors.onSurfaceVariant} />
           </View>
-        </TouchableRipple>
+        </NeuPressable>
 
         <Text variant="labelMedium" style={[styles.groupLabel, { color: theme.colors.onSurfaceVariant }]}>
           THIS APP
