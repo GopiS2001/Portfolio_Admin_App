@@ -90,6 +90,7 @@ const BLOCK_FIELDS: FieldDef[] = [
 /** Custom controls below, declared as plain fields so the form tracks and sends them too. */
 const CUSTOM_FIELDS: FieldDef[] = [
   { name: 'defaultTheme', label: 'Default theme' },
+  { name: 'designStyle', label: 'Design style' },
   { name: 'fontSans', label: 'Body font' },
   { name: 'fontSerif', label: 'Heading font' },
   { name: 'baseFontSize', label: 'Base font size' },
