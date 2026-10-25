@@ -16,7 +16,7 @@ import {
 import { ToastHost } from '@/components/ui';
 import { useAuth, AuthProvider } from '@/lib/auth';
 import { usePreferences, PreferencesProvider } from '@/lib/preferences';
-import { FONT, darkTheme, lightTheme, useAppTheme, withFontScale, navigationTheme } from '@/theme';
+import { FONT, makeTheme, useAppTheme, withFontScale, navigationTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
