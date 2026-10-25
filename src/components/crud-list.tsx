@@ -222,8 +222,7 @@ function ItemEditor<T extends Ordered>({
     <Modal visible={open} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       {/* Dialogs (select pickers) and toasts must render inside the modal to appear above it */}
       <Portal.Host>
-        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-          <Backdrop />
+        <GlassScene>
           <Appbar.Header
             statusBarHeight={Platform.OS === 'ios' ? 0 : insets.top}
             style={{ backgroundColor: theme.custom.surface.backdrop ? 'transparent' : theme.colors.background }}
