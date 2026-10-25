@@ -159,6 +159,7 @@ export default function ConfigurationScreen() {
       >
         {/* Status hero — the switch is part of the form, saved with the bar below */}
         <View style={[styles.hero, neu(theme, 'raised', 8)]}>
+          <GlassBlur radius={26} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
             <View style={[styles.heroIcon, neu(theme, 'inset', 4)]}>
               <Icon
