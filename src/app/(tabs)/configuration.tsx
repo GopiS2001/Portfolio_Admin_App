@@ -126,12 +126,6 @@ export default function ConfigurationScreen() {
   const { data: sections } = useResource<Section[]>(api.sections);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
 
-  // The app wears the website's saved design style (one picker for both, under Appearance)
-  const savedStyle = settings?.designStyle;
-  useEffect(() => {
-    if (savedStyle && DESIGN_STYLES.includes(savedStyle)) setDesignStyle(savedStyle);
-  }, [savedStyle, setDesignStyle]);
-
   const source = useMemo(
     () =>
       settings && {
