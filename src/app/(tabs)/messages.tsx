@@ -111,18 +111,7 @@ export default function MessagesScreen() {
     const isOpen = expanded === m.id;
     const accent = theme.custom.tones.info;
     return (
-      <Surface
-        key={m.id}
-        elevation={1}
-        style={[
-          styles.card,
-          {
-            backgroundColor: m.read ? theme.colors.surface : theme.dark ? '#13222A' : '#F1FBFD',
-            borderColor: m.read ? theme.custom.divider : accent.bg,
-            shadowColor: theme.custom.cardShadow,
-          },
-        ]}
-      >
+      <View key={m.id} style={[styles.card, neu(theme, 'raised', isOpen ? 8 : 6)]}>
         <View style={styles.cardInner}>
           {!m.read && <View style={[styles.accent, { backgroundColor: accent.main }]} />}
           <TouchableRipple onPress={() => open(m)}>
