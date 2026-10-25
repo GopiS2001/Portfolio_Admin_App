@@ -371,6 +371,7 @@ export function Card({
 
   return (
     <View style={[styles.card, neu(theme, 'raised', 7)]}>
+      <GlassBlur radius={24} />
       <View style={styles.cardInner}>
         {hasHeader && (
           <View style={styles.cardHeader}>
