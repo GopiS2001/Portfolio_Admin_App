@@ -406,9 +406,18 @@ function TagsField({ field, value, onChange }: { field: FieldDef; value: string[
       {value.length > 0 && (
         <View style={styles.tagWrap}>
           {value.map((t) => (
-            <Chip key={t} compact onClose={() => onChange(value.filter((x) => x !== t))} style={{ borderRadius: 10 }}>
-              {t}
-            </Chip>
+            <View key={t} style={[styles.tag, neu(theme, 'raised', 3)]}>
+              <Text variant="labelMedium">{t}</Text>
+              <Pressable
+                onPress={() => onChange(value.filter((x) => x !== t))}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={`Remove ${t}`}
+                style={({ pressed }) => [styles.tagClose, neu(theme, 'inset', pressed ? 1 : 2)]}
+              >
+                <Icon source="close" size={12} color={theme.colors.onSurfaceVariant} />
+              </Pressable>
+            </View>
           ))}
         </View>
       )}
