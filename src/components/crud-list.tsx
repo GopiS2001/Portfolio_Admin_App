@@ -129,8 +129,8 @@ export function CrudList<T extends Ordered>({
               {item.visible ? 'Visible' : 'Hidden'}
             </Text>
             <TapSwitch value={item.visible} onValueChange={() => toggleVisible(item)} accessibilityLabel="Visible on website" />
-            <IconButton icon="pencil-outline" label="Edit" onPress={() => setEditing(item)} />
-            <IconButton icon="trash-can-outline" label="Delete" color={theme.colors.error} onPress={() => setDeleting(item)} />
+            <IconButton icon="pencil-outline" label="Edit" size={18} tonal onPress={() => setEditing(item)} />
+            <IconButton icon="trash-can-outline" label="Delete" size={18} color={theme.colors.error} onPress={() => setDeleting(item)} />
           </View>
         </View>
       </View>
