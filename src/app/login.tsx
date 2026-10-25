@@ -42,8 +42,7 @@ export default function LoginScreen() {
   const stale = server.replace(/\/$/, '') !== DEFAULT_SERVER_URL;
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <Backdrop />
+    <GlassScene>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 24 }} keyboardShouldPersistTaps="handled">
           <View style={[styles.hero, { paddingTop: insets.top + 40 }]}>
