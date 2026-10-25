@@ -273,7 +273,7 @@ export default function ConfigurationScreen() {
             <Stepper label="Base font size" value={Number(v.baseFontSize)} min={12} max={22} unit="px" onChange={(n) => form.set('baseFontSize', n)} />
             <Stepper label="Heading size" value={Number(v.headingScale)} min={70} max={140} step={5} unit="%" onChange={(n) => form.set('headingScale', n)} />
 
-            <View style={[styles.preview, { backgroundColor: theme.custom.neutral, borderLeftColor: accent }]}>
+            <View style={[styles.preview, neu(theme, 'inset', 5), { borderLeftColor: accent }]}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, letterSpacing: 1.5 }}>
                 PREVIEW
               </Text>
