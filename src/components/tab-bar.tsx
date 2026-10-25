@@ -6,6 +6,8 @@ import { Text, Badge } from 'react-native-paper';
 
 import { neu, FONT, useAppTheme } from '@/theme';
 
+import { GlassBlur, floatingFill } from './ui';
+
 // ----------------------------------------------------------------------
 
 type TabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>>[0];
