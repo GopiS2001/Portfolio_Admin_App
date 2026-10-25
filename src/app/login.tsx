@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, TextInput, TouchableRipple } from 'react-native-paper';
 import { View, Image, Platform, StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
 
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { DEFAULT_SERVER_URL } from '@/lib/api';
 import { Input, Helper } from '@/components/fields';
