@@ -3,24 +3,25 @@ import type { TileKey } from '@/theme';
 import type { Message, Section, Summary, Settings } from '@/lib/types';
 
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { View, Linking, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { Text, TouchableRipple, Button as PaperButton } from 'react-native-paper';
+import { Text, TouchableRipple } from 'react-native-paper';
 
 import { useAuth } from '@/lib/auth';
-import { useAppTheme } from '@/theme';
+import { neu, useAppTheme } from '@/theme';
 import { SECTION_LABELS } from '@/lib/options';
 import { revalidate, useResource } from '@/lib/store';
 import { endpoints as api, websiteUrl, getServerUrl } from '@/lib/api';
 import {
   Icon,
   Card,
+  Button,
   Screen,
   Divider,
   TabHeader,
   EmptyState,
   ErrorBanner,
   GradientTile,
+  NeuPressable,
   ProgressRing,
   GradientAvatar,
 } from '@/components/ui';
@@ -67,17 +68,18 @@ function SectionTitle({ title, action, onAction }: { title: string; action?: str
   );
 }
 
-/** Translucent stat tile inside the hero card. */
-function GlassStat({ label, value, href }: { label: string; value?: number; href: Href }) {
+/** Raised stat tile inside the hero card; presses in on touch. */
+function StatTile({ label, value, href }: { label: string; value?: number; href: Href }) {
+  const theme = useAppTheme();
   return (
-    <Pressable onPress={() => router.push(href)} style={({ pressed }) => [styles.glass, pressed && { opacity: 0.75 }]}>
-      <Text variant="titleLarge" style={{ color: '#FFFFFF' }}>
+    <NeuPressable depth={4} onPress={() => router.push(href)} style={styles.stat}>
+      <Text variant="titleLarge" style={{ color: theme.colors.primary }}>
         {value ?? '–'}
       </Text>
-      <Text variant="labelSmall" numberOfLines={1} style={{ color: 'rgba(255,255,255,0.72)' }}>
+      <Text variant="labelSmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
         {label}
       </Text>
-    </Pressable>
+    </NeuPressable>
   );
 }
 
@@ -108,6 +110,7 @@ export default function OverviewScreen() {
   const live = sections?.filter((s) => s.visible).length ?? 0;
   const total = sections?.length ?? 0;
   const online = settings?.siteEnabled ?? true;
+  const status = theme.custom.tones[online ? 'success' : 'warning'];
 
   return (
     <Screen
@@ -119,63 +122,46 @@ export default function OverviewScreen() {
           title={`${greeting()}, ${firstName}`}
           right={
             <Pressable onPress={() => router.push('/account')} accessibilityLabel="Account" hitSlop={6}>
-              <GradientAvatar name={user?.displayName} size={46} />
+              <GradientAvatar name={user?.displayName} size={48} />
             </Pressable>
           }
         />
       }
     >
-      {/* Hero: website status ring + glass stats */}
-      <View style={[styles.heroShadow, { shadowColor: theme.custom.gradient[1] }]}>
-        <LinearGradient colors={theme.custom.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <View style={styles.glow} />
-          <View style={styles.glowSmall} />
+      {/* Hero: website status ring + stats */}
+      <View style={[styles.hero, neu(theme, 'raised', 9)]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18 }}>
+          <ProgressRing progress={total ? live / total : 0} size={108} stroke={9}>
+            <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
+              {sections ? `${live}/${total}` : '–'}
+            </Text>
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: -2 }}>
+              live
+            </Text>
+          </ProgressRing>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18 }}>
-            <ProgressRing progress={total ? live / total : 0} size={100} stroke={10}>
-              <Text variant="headlineSmall" style={{ color: '#FFFFFF' }}>
-                {sections ? `${live}/${total}` : '–'}
-              </Text>
-              <Text variant="labelSmall" style={{ color: 'rgba(255,255,255,0.7)', marginTop: -2 }}>
-                live
-              </Text>
-            </ProgressRing>
-
-            <View style={{ flex: 1, gap: 6 }}>
-              <View style={styles.status}>
-                <View style={[styles.dot, { backgroundColor: online ? '#5BE49B' : '#FFAC82' }]} />
-                <Text variant="labelSmall" style={{ color: '#FFFFFF' }}>
-                  {online ? 'Online' : 'Maintenance'}
-                </Text>
-              </View>
-              <Text variant="titleLarge" style={{ color: '#FFFFFF' }}>
-                {online ? 'Your site is live' : 'Site is paused'}
-              </Text>
-              <Text variant="bodySmall" style={{ color: 'rgba(255,255,255,0.72)' }}>
-                {settings?.updatedAt ? `Settings updated ${timeAgo(settings.updatedAt)}` : 'Sections shown on your portfolio'}
+          <View style={{ flex: 1, gap: 6 }}>
+            <View style={[styles.status, neu(theme, 'inset', 2)]}>
+              <View style={[styles.dot, { backgroundColor: status.main }]} />
+              <Text variant="labelSmall" style={{ color: status.fg }}>
+                {online ? 'Online' : 'Maintenance'}
               </Text>
             </View>
+            <Text variant="titleLarge">{online ? 'Your site is live' : 'Site is paused'}</Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+              {settings?.updatedAt ? `Settings updated ${timeAgo(settings.updatedAt)}` : 'Sections shown on your portfolio'}
+            </Text>
           </View>
+        </View>
 
-          <View style={styles.glassRow}>
-            <GlassStat label="Projects" value={summary?.projects} href="/content/projects" />
-            <GlassStat label="Roles" value={summary?.experiences} href="/content/experience" />
-            <GlassStat label="Skills" value={summary?.skills} href="/content/skills" />
-            <GlassStat label="Unread" value={summary?.unread} href="/messages" />
-          </View>
+        <View style={styles.statRow}>
+          <StatTile label="Projects" value={summary?.projects} href="/content/projects" />
+          <StatTile label="Roles" value={summary?.experiences} href="/content/experience" />
+          <StatTile label="Skills" value={summary?.skills} href="/content/skills" />
+          <StatTile label="Unread" value={summary?.unread} href="/messages" />
+        </View>
 
-          <PaperButton
-            mode="contained"
-            icon="open-in-new"
-            buttonColor="#FFFFFF"
-            textColor={theme.custom.gradient[1]}
-            onPress={() => Linking.openURL(websiteUrl())}
-            style={{ marginTop: 16, borderRadius: 14 }}
-            contentStyle={{ height: 46 }}
-          >
-            Open website
-          </PaperButton>
-        </LinearGradient>
+        <Button icon="open-in-new" label="Open website" onPress={() => Linking.openURL(websiteUrl())} style={{ marginTop: 20 }} />
       </View>
 
       {error && (
@@ -184,27 +170,19 @@ export default function OverviewScreen() {
         />
       )}
 
-      {/* Quick actions */}
+      {/* Quick actions — padded so the soft shadows aren't clipped by the scroll view */}
       <View>
         <SectionTitle title="Quick actions" />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingHorizontal: 2, paddingVertical: 4 }}
-          style={{ marginHorizontal: -16, paddingHorizontal: 14 }}
+          contentContainerStyle={{ gap: 16, paddingHorizontal: 18, paddingVertical: 14 }}
+          style={{ marginHorizontal: -18, marginVertical: -12 }}
         >
           {ACTIONS.map((a) => (
-            <TouchableRipple
-              key={a.label}
-              onPress={() => router.push(a.href)}
-              borderless
-              style={[
-                styles.action,
-                { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider },
-              ]}
-            >
-              <View style={{ gap: 12 }}>
-                <GradientTile icon={a.icon} tile={a.tile} size={42} />
+            <NeuPressable key={a.label} onPress={() => router.push(a.href)} style={styles.action}>
+              <View style={{ gap: 14 }}>
+                <GradientTile icon={a.icon} tile={a.tile} size={44} />
                 <View>
                   <Text variant="titleSmall">{a.label}</Text>
                   <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
@@ -212,9 +190,8 @@ export default function OverviewScreen() {
                   </Text>
                 </View>
               </View>
-            </TouchableRipple>
+            </NeuPressable>
           ))}
-          <View style={{ width: 18 }} />
         </ScrollView>
       </View>
 
@@ -263,10 +240,7 @@ export default function OverviewScreen() {
           {(sections ?? []).map((s) => {
             const tone = theme.custom.tones[s.visible ? 'success' : 'default'];
             return (
-              <View
-                key={s.key}
-                style={[styles.sectionTile, { backgroundColor: theme.colors.surface, borderColor: theme.custom.divider }]}
-              >
+              <View key={s.key} style={[styles.sectionTile, neu(theme, s.visible ? 'raised' : 'inset', 4)]}>
                 <Icon source={s.visible ? 'check-circle' : 'eye-off-outline'} size={20} color={tone.main} />
                 <Text variant="labelLarge" numberOfLines={1} style={{ marginTop: 8 }}>
                   {SECTION_LABELS[s.key].replace(' (hero)', '')}
@@ -284,32 +258,7 @@ export default function OverviewScreen() {
 }
 
 const styles = StyleSheet.create({
-  heroShadow: {
-    borderRadius: 30,
-    shadowOpacity: 0.35,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 8,
-  },
-  hero: { padding: 20, borderRadius: 30, overflow: 'hidden' },
-  glow: {
-    position: 'absolute',
-    right: -80,
-    top: -80,
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  glowSmall: {
-    position: 'absolute',
-    left: -40,
-    bottom: -60,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-  },
+  hero: { padding: 20, borderRadius: 30 },
   status: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -318,28 +267,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     height: 26,
     borderRadius: 13,
-    backgroundColor: 'rgba(255,255,255,0.14)',
   },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  glassRow: { flexDirection: 'row', gap: 8, marginTop: 20 },
-  glass: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.22)',
-  },
+  statRow: { flexDirection: 'row', gap: 10, marginTop: 22 },
+  stat: { flex: 1, paddingVertical: 12, paddingHorizontal: 10, borderRadius: 16 },
   sectionTitle: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 4,
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  action: { width: 150, padding: 16, borderRadius: 22, borderWidth: StyleSheet.hairlineWidth },
+  action: { width: 150, padding: 16, borderRadius: 22 },
   msg: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, paddingVertical: 14 },
-  sections: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  sectionTile: { flexBasis: '31%', flexGrow: 1, padding: 14, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth },
+  sections: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  sectionTile: { flexBasis: '30%', flexGrow: 1, padding: 14, borderRadius: 18 },
 });
