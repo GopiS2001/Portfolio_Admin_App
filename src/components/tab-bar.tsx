@@ -89,8 +89,17 @@ export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) 
 
 const styles = StyleSheet.create({
   wrap: { position: 'absolute', left: 14, right: 14 },
-  bar: { flexDirection: 'row', alignItems: 'center', gap: 4, borderRadius: 34, padding: 8 },
-  item: { flex: 1 },
-  capsule: { alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 9, borderRadius: 26 },
+  bar: { flexDirection: 'row', alignItems: 'center', gap: 4, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 10 },
+  item: { flex: 1, borderRadius: 999 },
+  // Fully rounded: the active / pressed indicator is an oval pill around icon + label
+  capsule: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    borderRadius: 999,
+    borderColor: 'transparent',
+  },
   badge: { position: 'absolute', top: -5, right: -10 },
 });
