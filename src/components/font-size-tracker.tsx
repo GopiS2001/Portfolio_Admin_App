@@ -1,7 +1,7 @@
 import { View, Pressable, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { FONT, useAppTheme } from '@/theme';
+import { neu, FONT, useAppTheme } from '@/theme';
 import { FONT_SIZE_MAX, FONT_SIZE_MIN, FONT_SIZE_DEFAULT } from '@/lib/preferences';
 
 import { Icon, Button } from './ui';
