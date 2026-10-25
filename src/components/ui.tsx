@@ -227,7 +227,12 @@ export function NeuView({
   children?: React.ReactNode;
 }) {
   const theme = useAppTheme();
-  return <View style={[neu(theme, kind, depth), style]}>{children}</View>;
+  return (
+    <View style={[neu(theme, kind, depth), style]}>
+      {kind === 'raised' && <GlassBlur radius={radiusOf(style)} />}
+      {children}
+    </View>
+  );
 }
 
 /** Raised surface that sinks in while pressed — the soft-UI touch feedback. */
