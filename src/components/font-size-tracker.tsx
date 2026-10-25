@@ -50,8 +50,8 @@ export function FontSizeTracker({ value, onChange }: { value: number; onChange: 
       {/* Tracker */}
       <View accessibilityRole="adjustable" accessibilityLabel={`Text size ${value} pixels`}>
         <View style={styles.trackRow}>
-          {/* Line behind the nodes: grey track + filled part up to the current step */}
-          <View style={[styles.line, { left: half, right: half, backgroundColor: theme.colors.outlineVariant }]}>
+          {/* Engraved groove behind the nodes + filled part up to the current step */}
+          <View style={[styles.line, neu(theme, 'inset', 2), { left: half, right: half }]}>
             <View style={[styles.lineFill, { width: `${progress * 100}%`, backgroundColor: theme.colors.primary }]} />
           </View>
 
