@@ -219,8 +219,9 @@ export const useAppTheme = () => useTheme<AppTheme>();
 // ---------------------------------------------------------------------- neumorphism
 
 /**
- * Soft-UI depth for a view on the base colour:  pushes it out of the page,  * presses it in.  is the shadow offset in px (blur is twice that). Spread it into a
- * style; set  after it for a tinted surface.
+ * Soft-UI depth for a view on the base colour: `raised` pushes it out of the page, `inset`
+ * presses it in. `depth` is the shadow offset in px (blur is twice that). Spread it into a
+ * style; set `backgroundColor` after it for a tinted surface.
  */
 export function neu(theme: AppTheme, kind: 'raised' | 'inset' = 'raised', depth = 6) {
   const { light, dark } = theme.custom.neu;
