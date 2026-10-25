@@ -306,6 +306,10 @@ const SHADOWS: Record<DesignStyle, (p: Palette, kind: 'raised' | 'inset', d: num
       ? `inset 0px 1px 0px ${p.light}, inset 0px -2px 0px rgba(0, 0, 0, 0.07), 0px ${y}px ${Math.round(d * 0.8)}px ${p.dark}, 0px 1px 1px rgba(0, 0, 0, 0.2)`
       : `inset 0px ${y + 1}px ${d}px ${p.dark}, 0px 1px 0px ${p.light}`;
   },
+  zephyr: (p, kind, d) =>
+    kind === 'raised'
+      ? `inset 0px 1px 0px ${p.light}, 0px ${d * 2}px ${d * 5}px ${-d * 2}px ${p.dark}`
+      : `inset 0px 1px ${Math.ceil(d / 2)}px ${p.dark}`,
 };
 
 // ---------------------------------------------------------------------- themes
