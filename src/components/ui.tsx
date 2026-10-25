@@ -90,26 +90,86 @@ export function Screen({
       )}
       {children}
     </ScrollView>
-    </View>
+    </GlassScene>
+  );
+}
+
+// ---------------------------------------------------------------------- Glass (backdrop + blur)
+
+/** The view glass panes blur on Android (expo-blur can only blur a BlurTargetView there). */
+const BlurTargetContext = createContext<React.RefObject<View | null> | null>(null);
+
+/**
+ * Page wrapper: base colour, the style's backdrop and the content. In glassmorphism the
+ * backdrop is the blur target that every `GlassBlur` inside frosts.
+ */
+export function GlassScene({ children }: { children: React.ReactNode }) {
+  const theme = useAppTheme();
+  const target = useRef<View | null>(null);
+  return (
+    <BlurTargetContext.Provider value={target}>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        <Backdrop target={target} />
+        {children}
+      </View>
+    </BlurTargetContext.Provider>
   );
 }
 
 /**
  * Page decoration behind the content for styles that need it — glassmorphism paints a colourful
- * gradient with two soft orbs so the translucent panes have something to frost. Others: nothing.
+ * gradient with two soft orbs for the panes to frost. Others: nothing.
  */
-export function Backdrop() {
+export function Backdrop({ target }: { target?: React.RefObject<View | null> }) {
   const theme = useAppTheme();
   const colors = theme.custom.surface.backdrop;
   if (!colors) return null;
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <BlurTargetView ref={target} pointerEvents="none" style={StyleSheet.absoluteFill}>
       <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
       <View style={[styles.orb, { top: -70, right: -90, backgroundColor: colors[2] }]} />
       <View style={[styles.orb, { bottom: 60, left: -110, backgroundColor: colors[0] }]} />
-    </View>
+    </BlurTargetView>
   );
 }
+
+/**
+ * Real frosted-glass blur behind a pane (glassmorphism only). Put it first inside the pane and
+ * pass the pane's corner radius. iOS / web blur whatever is behind; Android blurs the screen's
+ * backdrop, so outside a `GlassScene` it renders nothing there.
+ */
+export function GlassBlur({ radius = 0, intensity = 30 }: { radius?: number; intensity?: number }) {
+  const theme = useAppTheme();
+  const target = useContext(BlurTargetContext);
+  if (theme.custom.style !== 'glassmorphism') return null;
+  const android = Platform.OS === 'android';
+  if (android && !target) return null;
+  return (
+    <BlurView
+      pointerEvents="none"
+      intensity={intensity}
+      tint={theme.dark ? 'dark' : 'light'}
+      {...(android && target ? { blurTarget: target, blurMethod: 'dimezisBlurViewSdk31Plus' as const } : null)}
+      // BlurView ignores borderRadius without overflow hidden
+      style={[StyleSheet.absoluteFill, { borderRadius: radius, overflow: 'hidden' }]}
+    />
+  );
+}
+
+/**
+ * Fill for bars floating over scrolling content (tab bar, toast, save bar). Glass on iOS / web:
+ * translucent, a `GlassBlur` frosts what scrolls underneath. Android can only blur the backdrop,
+ * not the content, so it keeps the near-opaque fill there.
+ */
+export function floatingFill(theme: AppTheme) {
+  const p = theme.custom.surface;
+  return theme.custom.style === 'glassmorphism' && Platform.OS !== 'android' ? p.fill : p.solid;
+}
+
+const radiusOf = (style: StyleProp<ViewStyle>) => {
+  const r = StyleSheet.flatten(style)?.borderRadius;
+  return typeof r === 'number' ? r : 0;
+};
 
 /** Height kept free at the bottom of tab screens for the floating tab bar. */
 export const TAB_BAR_SPACE = 112;
