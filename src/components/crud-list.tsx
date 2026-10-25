@@ -222,6 +222,7 @@ function ItemEditor<T extends Ordered>({
       {/* Dialogs (select pickers) and toasts must render inside the modal to appear above it */}
       <Portal.Host>
         <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+          <Backdrop />
           <Appbar.Header
             statusBarHeight={Platform.OS === 'ios' ? 0 : insets.top}
             style={{ backgroundColor: theme.colors.background }}
