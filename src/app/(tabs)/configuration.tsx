@@ -268,11 +268,11 @@ export default function ConfigurationScreen() {
               </Text>
               <Segmented<ThemeMode> value={v.defaultTheme} onChange={(t) => form.set('defaultTheme', t)} options={THEMES} />
             </View>
-            {/* The website's look for every visitor — separate from this app's own style above */}
+            {/* One style for both: the website's look for every visitor, and this app follows it once saved */}
             <View>
-              <Text variant="titleSmall">Website design style</Text>
+              <Text variant="titleSmall">Design style</Text>
               <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 12 }}>
-                Cards, buttons, fields and the menu on your website
+                Your website and this app — the app switches when you save
               </Text>
               <DesignStylePicker value={v.designStyle} onChange={(s) => form.set('designStyle', s)} />
             </View>
