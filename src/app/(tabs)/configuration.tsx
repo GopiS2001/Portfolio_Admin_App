@@ -67,6 +67,12 @@ const THEME_FIELDS: FieldDef[] = [
     type: 'switch',
     helperText: 'Off hides the sun/moon button and always uses the default theme below.',
   },
+  {
+    name: 'enableStyleSwitcher',
+    label: 'Visitors can switch style',
+    type: 'switch',
+    helperText: 'Shows a palette button in the website header to try the other design styles.',
+  },
   { name: 'accentLight', label: 'Accent colour (light mode)', type: 'color' },
   { name: 'accentDark', label: 'Accent colour (dark mode)', type: 'color' },
 ];
@@ -322,7 +328,7 @@ export default function ConfigurationScreen() {
             { backgroundColor: floatingFill(theme), bottom: Math.max(insets.bottom, 10) + TAB_BAR_SPACE - 24 },
           ]}
         >
-          <GlassBlur radius={22} intensity={60} />
+          <GlassBlur radius={22} intensity={90} />
           <Icon source="pencil-circle" size={22} color={theme.colors.primary} />
           <Text variant="labelLarge" style={{ flex: 1 }}>
             Unsaved changes
