@@ -4,7 +4,7 @@ import type { Section, Settings, ThemeMode } from '@/lib/types';
 
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Platform, UIManager, StyleSheet, LayoutAnimation } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
