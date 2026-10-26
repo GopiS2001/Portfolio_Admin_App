@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
