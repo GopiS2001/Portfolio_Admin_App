@@ -889,6 +889,7 @@ const styles = StyleSheet.create({
   screen: { padding: 18, gap: 20, paddingBottom: 56 },
   orb: { position: 'absolute', width: 280, height: 280, borderRadius: 140, opacity: 0.55 },
   tabHeader: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingHorizontal: 4, paddingBottom: 6 },
+  stackHeader: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 2 },
   card: { borderRadius: 24 },
   cardInner: { borderRadius: 24, overflow: 'hidden' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingVertical: 16 },
