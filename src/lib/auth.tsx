@@ -25,7 +25,15 @@ const REFRESH_KEY = 'refreshToken';
 const LEGACY_TOKEN_KEY = 'accessToken';
 const SERVER_KEY = 'serverUrl';
 
-export type User = { id: number; email: string; displayName: string; role?: string };
+export type User = {
+  id: number;
+  email: string;
+  displayName: string;
+  role?: string;
+  /** Edited on the web dashboard; null / missing when not set. */
+  phone?: string | null;
+  gender?: string | null;
+};
 
 type TokenResponse = {
   accessToken: string;
