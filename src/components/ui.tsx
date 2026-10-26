@@ -233,6 +233,24 @@ export function TabHeader({
   );
 }
 
+/**
+ * Back button + title for pages pushed over the tabs. Rendered inside the scroll view (instead of
+ * a fixed native header) so it scrolls away with the content.
+ */
+export function StackHeader() {
+  const insets = useSafeAreaInsets();
+  const route = useRoute();
+  const title = STACK_TITLES[route.name as StackRoute] ?? '';
+  return (
+    <View style={[styles.stackHeader, { paddingTop: insets.top + 8 }]}>
+      {router.canGoBack() && <IconButton icon="arrow-left" label="Back" onPress={() => router.back()} />}
+      <Text variant="headlineSmall" accessibilityRole="header" numberOfLines={1} style={{ flex: 1 }}>
+        {title}
+      </Text>
+    </View>
+  );
+}
+
 // ---------------------------------------------------------------------- Neumorphic building blocks
 
 /** A view raised out of (or pressed into) the page. */
