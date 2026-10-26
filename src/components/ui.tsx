@@ -6,6 +6,7 @@ import { View, Linking, Animated, Platform, Pressable, StyleSheet, ScrollView, R
 import { Text, Icon, Dialog, Portal, ActivityIndicator } from 'react-native-paper';
 
 import Svg, { Circle } from 'react-native-svg';
+import { useFocusEffect } from 'expo-router';
 import { BlurView, BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
