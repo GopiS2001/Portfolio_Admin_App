@@ -27,7 +27,8 @@
     "plugins": [
       "expo-router",
       "expo-status-bar",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-system-ui"
     ],
     "scheme": "portfolioadmin",
     "owner": "gopis2001",
