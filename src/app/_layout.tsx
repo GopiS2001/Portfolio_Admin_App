@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider, ActivityIndicator } from 'react-native-paper';
@@ -96,7 +97,9 @@ function ThemedApp() {
         <ThemeProvider value={navigationTheme(theme, theme.dark ? DarkTheme : DefaultTheme)}>
           <AuthProvider>
             <StatusBar style={theme.dark ? 'light' : 'dark'} />
-            <RootNavigator />
+            <ProfileMenuProvider>
+              <RootNavigator />
+            </ProfileMenuProvider>
             <ToastHost />
           </AuthProvider>
         </ThemeProvider>
