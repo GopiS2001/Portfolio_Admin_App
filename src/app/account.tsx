@@ -51,7 +51,7 @@ export default function AccountScreen() {
 
   const savePassword = async () => {
     if (!password.validate()) return;
-    const { currentPassword, newPassword, confirmPassword } = password.values;
+    const { newPassword, confirmPassword } = password.values;
     if (newPassword.length < 6) return toast.error('New password needs at least 6 characters');
     if (newPassword !== confirmPassword) return toast.error('Passwords do not match');
     setSavingPassword(true);
