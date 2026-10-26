@@ -157,12 +157,15 @@ export function Backdrop({ target }: { target?: React.RefObject<View | null> }) 
  */
 export function GlassBlur({ radius = 0, intensity = 60 }: { radius?: number; intensity?: number }) {
   const theme = useAppTheme();
-  const target = useContext(BlurTargetContext);
+  const scene = useContext(BlurTargetContext);
   if (theme.custom.style !== 'glassmorphism') return null;
   const android = Platform.OS === 'android';
+  const target = scene?.target;
   if (android && !target) return null;
   return (
     <BlurView
+      // New native view per focus on Android (see GlassScene)
+      key={scene?.generation ?? 0}
       pointerEvents="none"
       intensity={intensity}
       tint={theme.dark ? 'dark' : 'light'}
