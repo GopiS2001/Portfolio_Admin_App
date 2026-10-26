@@ -1,73 +1,31 @@
-import type { FieldDef } from '@/components/fields';
-
-import { useMemo, useState } from 'react';
+import { router } from 'expo-router';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme';
 import { useAuth } from '@/lib/auth';
-import { http, endpoints as api } from '@/lib/api';
-import { Card, toast, Button, Screen, GradientAvatar } from '@/components/ui';
-import { FormFields, useFieldForm } from '@/components/fields';
+import { Input } from '@/components/fields';
+import { Card, Button, Screen, GradientAvatar } from '@/components/ui';
 
 // ----------------------------------------------------------------------
 
-const ACCOUNT_FIELDS: FieldDef[] = [
-  { name: 'displayName', label: 'Name', required: true },
-  { name: 'email', label: 'Email (login)', required: true, keyboard: 'email-address' },
-];
+// Keep in sync with GENDERS in BACKEND/src/auth/auth.controller.ts
+const GENDER_LABELS: Record<string, string> = { male: 'Male', female: 'Female', other: 'Other' };
 
-const PASSWORD_FIELDS: FieldDef[] = [
-  { name: 'newPassword', label: 'New password', type: 'password', required: true },
-  { name: 'confirmPassword', label: 'Confirm new password', type: 'password', required: true },
-];
-
-export default function AccountScreen() {
+/** Read-only profile; the details are edited on the web dashboard's Account page. */
+export default function ProfileScreen() {
   const theme = useAppTheme();
   const { user, refreshUser } = useAuth();
-  const source = useMemo(() => ({ displayName: user?.displayName, email: user?.email }), [user]);
-  const account = useFieldForm(ACCOUNT_FIELDS, source);
-  const password = useFieldForm(PASSWORD_FIELDS, null);
-  const [savingAccount, setSavingAccount] = useState(false);
-  const [savingPassword, setSavingPassword] = useState(false);
 
-  const saveAccount = async () => {
-    if (!account.validate()) return;
-    if (!/^\S+@\S+\.\S+$/.test(account.values.email)) {
-      toast.error('Enter a valid email');
-      return;
-    }
-    setSavingAccount(true);
-    try {
-      await http.put(api.account, account.body());
-      await refreshUser();
-      toast.success('Account updated');
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setSavingAccount(false);
-    }
-  };
-
-  const savePassword = async () => {
-    if (!password.validate()) return;
-    const { newPassword, confirmPassword } = password.values;
-    if (newPassword.length < 6) return toast.error('New password needs at least 6 characters');
-    if (newPassword !== confirmPassword) return toast.error('Passwords do not match');
-    setSavingPassword(true);
-    try {
-      await http.put(api.password, { newPassword });
-      password.reset();
-      toast.success('Password changed');
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setSavingPassword(false);
-    }
-  };
+  const rows = [
+    { label: 'Name', value: user?.displayName },
+    { label: 'Email', value: user?.email },
+    { label: 'Phone', value: user?.phone },
+    { label: 'Gender', value: user?.gender ? (GENDER_LABELS[user.gender] ?? user.gender) : '' },
+  ];
 
   return (
-    <Screen>
+    <Screen onRefresh={refreshUser}>
       <View style={{ alignItems: 'center', paddingVertical: 8 }}>
         <GradientAvatar name={user?.displayName} size={88} />
         <Text variant="titleLarge" style={{ marginTop: 18 }}>
@@ -78,15 +36,15 @@ export default function AccountScreen() {
         </Text>
       </View>
 
-      <Card title="Admin account" subheader="Used to sign in to the dashboard and this app." icon="account-cog-outline">
-        <FormFields fields={ACCOUNT_FIELDS} form={account} />
-        <Button icon="check" label="Save account" loading={savingAccount} onPress={saveAccount} style={{ marginTop: 20 }} />
+      <Card title="Profile details" subheader="Edit these on the web dashboard → Account." icon="account-outline">
+        <View style={{ gap: 14 }}>
+          {rows.map((r) => (
+            <Input key={r.label} label={r.label} value={r.value || 'Not set'} disabled editable={false} />
+          ))}
+        </View>
       </Card>
 
-      <Card title="Change password" subheader="At least 6 characters." icon="lock-reset">
-        <FormFields fields={PASSWORD_FIELDS} form={password} />
-        <Button icon="lock-check-outline" label="Change password" loading={savingPassword} onPress={savePassword} style={{ marginTop: 20 }} />
-      </Card>
+      <Button variant="soft" icon="lock-reset" label="Update password" onPress={() => router.push('/password')} />
     </Screen>
   );
 }
