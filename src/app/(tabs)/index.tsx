@@ -26,6 +26,7 @@ import {
   ProgressRing,
   GradientAvatar,
 } from '@/components/ui';
+import { ProfileMenuButton } from '@/components/profile-menu';
 
 // ----------------------------------------------------------------------
 
