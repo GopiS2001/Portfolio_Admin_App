@@ -19,9 +19,11 @@ export default function ProfileScreen() {
   const [saving, setSaving] = useState(false);
 
   // Follow the account when it changes (pull-to-refresh, edits on the dashboard)
-  useEffect(() => {
+  const [syncedPhone, setSyncedPhone] = useState(user?.phone);
+  if (syncedPhone !== user?.phone) {
+    setSyncedPhone(user?.phone);
     setPhone(user?.phone ?? '');
-  }, [user?.phone]);
+  }
 
   const changed = phone.trim() !== (user?.phone ?? '');
 
