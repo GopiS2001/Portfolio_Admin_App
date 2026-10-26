@@ -15,8 +15,9 @@ import {
 
 import { ToastHost } from '@/components/ui';
 import { useAuth, AuthProvider } from '@/lib/auth';
+import { STACK_TITLES, type StackRoute } from '@/lib/screens';
 import { usePreferences, PreferencesProvider } from '@/lib/preferences';
-import { FONT, makeTheme, useAppTheme, withFontScale, navigationTheme } from '@/theme';
+import { makeTheme, useAppTheme, withFontScale, navigationTheme } from '@/theme';
 
 // ----------------------------------------------------------------------
 
@@ -71,6 +72,12 @@ function ThemedApp() {
     () => withFontScale(makeTheme(dark, designStyle), fontScale),
     [dark, designStyle, fontScale]
   );
+  // Paint the native window in the page colour too. It shows through while a screen is being
+  // re-attached during the back animation — left at Android's default it flashed white.
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(theme.colors.background).catch(() => {});
+  }, [theme.colors.background]);
+
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
