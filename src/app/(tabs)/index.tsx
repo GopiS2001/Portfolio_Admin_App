@@ -121,11 +121,7 @@ export default function OverviewScreen() {
         <TabHeader
           overline={today()}
           title={`${greeting()}, ${firstName}`}
-          right={
-            <Pressable onPress={() => router.push('/account')} accessibilityLabel="Account" hitSlop={6}>
-              <GradientAvatar name={user?.displayName} size={48} />
-            </Pressable>
-          }
+          right={<ProfileMenuButton size={48} />}
         />
       }
     >
