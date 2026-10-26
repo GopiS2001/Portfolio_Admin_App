@@ -56,7 +56,7 @@ export default function AccountScreen() {
     if (newPassword !== confirmPassword) return toast.error('Passwords do not match');
     setSavingPassword(true);
     try {
-      await http.put(api.password, { currentPassword, newPassword });
+      await http.put(api.password, { newPassword });
       password.reset();
       toast.success('Password changed');
     } catch (e) {
