@@ -15,6 +15,7 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 
 import { ToastHost } from '@/components/ui';
+import { ProfileMenuProvider } from '@/components/profile-menu';
 import { useAuth, AuthProvider } from '@/lib/auth';
 import { STACK_TITLES, type StackRoute } from '@/lib/screens';
 import { usePreferences, PreferencesProvider } from '@/lib/preferences';
