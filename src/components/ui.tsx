@@ -76,7 +76,7 @@ export function Screen({
         ) : undefined
       }
     >
-      {header}
+      {header ?? (tab ? null : <StackHeader />)}
       {anchor !== undefined && (
         <Button
           variant="soft"
