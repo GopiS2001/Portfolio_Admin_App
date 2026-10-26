@@ -30,9 +30,8 @@ export type User = {
   email: string;
   displayName: string;
   role?: string;
-  /** Edited on the web dashboard; null / missing when not set. */
+  /** Null / missing when not set. */
   phone?: string | null;
-  gender?: string | null;
 };
 
 type TokenResponse = {
