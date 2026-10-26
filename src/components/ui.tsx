@@ -35,7 +35,7 @@ export function Screen({
   onRefresh?: () => Promise<unknown> | void;
   /** Anchor on the website to open with "Preview" (e.g. "projects"). */
   anchor?: string;
-  /** Large header rendered at the top of the scroll (tab screens). */
+  /** Large header rendered at the top of the scroll (tab screens). Pushed pages get StackHeader. */
   header?: React.ReactNode;
   /** Tab screen: leaves room for the floating tab bar. */
   tab?: boolean;
