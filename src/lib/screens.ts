@@ -8,7 +8,8 @@ export const STACK_TITLES = {
   'content/experience': 'Experience',
   'content/projects': 'Projects',
   'content/contact': 'Contact',
-  account: 'Account',
+  account: 'Profile',
+  password: 'Update password',
 } as const;
 
 export type StackRoute = keyof typeof STACK_TITLES;
