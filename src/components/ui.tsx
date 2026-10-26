@@ -94,8 +94,13 @@ export function Screen({
 
 // ---------------------------------------------------------------------- Glass (backdrop + blur)
 
-/** The view glass panes blur on Android (expo-blur can only blur a BlurTargetView there). */
-const BlurTargetContext = createContext<React.RefObject<View | null> | null>(null);
+/**
+ * The view glass panes blur on Android (expo-blur can only blur a BlurTargetView there), plus a
+ * counter that bumps each time the screen comes back into focus.
+ */
+const BlurTargetContext = createContext<{ target: React.RefObject<View | null>; generation: number } | null>(
+  null
+);
 
 /**
  * Page wrapper: base colour, the style's backdrop and the content. In glassmorphism the
@@ -104,8 +109,22 @@ const BlurTargetContext = createContext<React.RefObject<View | null> | null>(nul
 export function GlassScene({ children }: { children: React.ReactNode }) {
   const theme = useAppTheme();
   const target = useRef<View | null>(null);
+
+  // Android: pushing another screen detaches this one, and expo-blur only wires its native blur
+  // to the target on first attach — coming back left every pane drawing an empty (black) buffer.
+  // Bumping the generation on re-focus remounts the BlurViews so they wire up again.
+  const [generation, setGeneration] = useState(0);
+  const focusedBefore = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') return;
+      if (focusedBefore.current) setGeneration((g) => g + 1);
+      focusedBefore.current = true;
+    }, [])
+  );
+
   return (
-    <BlurTargetContext.Provider value={target}>
+    <BlurTargetContext.Provider value={{ target, generation }}>
       <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <Backdrop target={target} />
         {children}
